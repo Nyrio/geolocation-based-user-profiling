@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Core.h"
 #include "Terminal.h"
 #include <iostream>
