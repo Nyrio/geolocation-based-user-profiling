@@ -10,11 +10,11 @@ api:
 	echo "TODO"
 
 common:
+	echo "Compiling data and services layers"
 	mkdir -p build
 	$(MAKE) -C data
 	$(MAKE) -C services
-	echo "TODO"
 
 clean:
 	echo "Cleaning build files"
-	rm -r -f build
+	- rm -rf build

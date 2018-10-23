@@ -5,7 +5,12 @@ BUILD_DIR = ../build
 LIB_DIR = ../lib
 INCLUDE_DIR = ../include
 
+CPP_FILES = $(wildcard *.cpp)
+OBJ_FILES = $(patsubst %.cpp, $(BUILD_DIR)/%.o, $(CPP_FILES))
 
-all:
-	echo "services"
-	g++ $(VERSION) $(CFLAGS) -I $(INCLUDE_DIR) -c -o $(BUILD_DIR)/Core.o Core.cpp
+
+all: $(OBJ_FILES)
+	echo "Compiled services layer"
+
+$(BUILD_DIR)/%.o: %.cpp
+	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c $< -o $@

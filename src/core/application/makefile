@@ -5,12 +5,17 @@ BUILD_DIR = ../build
 LIB_DIR = ../lib
 INCLUDE_DIR = ../include
 
+OBJ_FILES = $(wildcard $(BUILD_DIR)/*.o)
+MAIN_OBJ = cli.o api.o
 
-cli:
-	echo "CLI"
-	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/Terminal.o Terminal.cpp
-	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/ConsoleApplication1.o ConsoleApplication1.cpp
-	g++ $(VERSION) -o cli $(BUILD_DIR)/Terminal.o $(BUILD_DIR)/ConsoleApplication1.o $(BUILD_DIR)/Core.o
 
-api:
-	echo "API"
+cli: clear-main
+	echo "Compiling CLI"
+	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/cli.o cli.cpp
+	g++ $(VERSION) -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES)
+
+api: clear-main
+	echo "Compiling API"
+
+clear-main:
+	- rm $(patsubst %, $(BUILD_DIR)/%, $(MAIN_OBJ))
