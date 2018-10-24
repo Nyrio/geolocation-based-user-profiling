@@ -1,0 +1,21 @@
+VERSION = -std=c++11
+CFLAGS = -Wall
+
+BUILD_DIR = ../build
+LIB_DIR = ../lib
+INCLUDE_DIR = ../include
+
+OBJ_FILES = $(wildcard $(BUILD_DIR)/*.o)
+MAIN_OBJ = cli.o api.o
+
+
+cli: clear-main
+	echo "Compiling CLI"
+	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/cli.o cli.cpp
+	g++ $(VERSION) -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES)
+
+api: clear-main
+	echo "Compiling API"
+
+clear-main:
+	- rm $(patsubst %, $(BUILD_DIR)/%, $(MAIN_OBJ))

@@ -1,0 +1,13 @@
+# binaries
+bin/
+*.exe
+src/core/build/
+
+# ms-windows
+.vs
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# editors
+*~
