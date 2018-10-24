@@ -2,5 +2,5 @@
 
 namespace data
 {
-	void db_query();
+	void rawdata_query();
 }
