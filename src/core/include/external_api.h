@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "LocPoint.h"
 
 using namespace std;
 
@@ -12,5 +13,5 @@ namespace data
 
 	void api_query(); // placeholder
 
-	Building* get_building(float lat, float lon, float radius = 5.0f);
+	Building* get_building(LocPoint lp, float radius = 5.0f);
 }

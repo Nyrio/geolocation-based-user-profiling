@@ -2,15 +2,8 @@
 
 namespace data 
 {
-	class LocPoint
-	{
-	public:
-		LocPoint(double lat, double longi);
-		~LocPoint();
-
-    protected:
-        double lat;
-        double longi;
-	};
-
+	typedef struct {
+		double lat;
+		double longi;
+	} LocPoint;
 }
