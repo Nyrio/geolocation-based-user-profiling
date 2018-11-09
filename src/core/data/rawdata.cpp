@@ -3,6 +3,9 @@
 
 using namespace std;
 
-void data::rawdata_query() {
+void data::rawdata_query(int id) {
 	cout << "The raw data says hi" << endl;
+	UserData u;
+	int size = u.list.size();
+	cout << to_string(size)<<endl;
 }
