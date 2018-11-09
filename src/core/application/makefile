@@ -12,7 +12,7 @@ MAIN_OBJ = cli.o api.o
 cli: clear-main
 	echo "Compiling CLI"
 	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/cli.o cli.cpp
-	g++ $(VERSION) -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES)
+	g++ $(VERSION) -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES) -lws2_32
 
 api: clear-main
 	echo "Compiling API"

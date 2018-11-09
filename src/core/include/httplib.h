@@ -29,7 +29,7 @@
 #define S_ISDIR(m)  (((m)&S_IFDIR)==S_IFDIR)
 #endif //S_ISDIR
 
-#define NOMINMAX
+#define NOMINMAX2
 
 #include <io.h>
 #include <winsock2.h>
