@@ -24,6 +24,7 @@ int main(int argc, char* argv[]) {
 
 
 	services::Core c(wp);
+	c.do_stuff();
 
 	return 0;
 }

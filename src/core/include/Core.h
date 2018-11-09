@@ -10,6 +10,8 @@ namespace services
 		Core(std::string parameterFile = "");
 		~Core();
 
+		void do_stuff();
+
 	protected:
 		data::WorkflowParam wp;
 	};

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "LocPoint.h"
+#include "datatypes.h"
 
 #include <deque>
 #include <ctime>

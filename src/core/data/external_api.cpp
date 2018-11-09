@@ -4,7 +4,6 @@
 #include "fmt/format.h"
 #include "httplib.h"
 #include "json.hpp"
-#include "LocPoint.h"
 
 using namespace std;
 using json = nlohmann::json;
@@ -21,7 +20,7 @@ data::Building* data::get_building(data::LocPoint lp, float radius)
 		"[out:json][timeout:10];"
 		" way(around:{2},{0},{1})['building'~'.*'];"
 		" out tags;",
-		lp.lat, lp.longi, radius
+		lp.lat, lp.lon, radius
 	);
 
 	string api_url = "lz4.overpass-api.de";

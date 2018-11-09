@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include "LocPoint.h"
+#include "datatypes.h"
 
 using namespace std;
 
