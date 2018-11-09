@@ -2,6 +2,8 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+using namespace std;
+
 data::LocPoint services::cluster_centroid(data::Cluster cluster)
 {
 	// It would be false to consider latitude and longitude as cartesian
@@ -27,4 +29,12 @@ data::LocPoint services::cluster_centroid(data::Cluster cluster)
 	double c_lon = atan2(y, x) * 180.0 / M_PI;
 
 	return { c_lat, c_lon };
+}
+
+
+double services::get_cluster_hours_spent(data::Cluster cluster)
+{
+	time_t earliest = (*cluster.begin()).t;
+	time_t latest = (*cluster.rbegin()).t;
+	return difftime(latest, earliest) / 3600.0;
 }
