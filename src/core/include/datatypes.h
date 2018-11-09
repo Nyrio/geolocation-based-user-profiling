@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #include <ctime>
 #include <set>
 
@@ -27,4 +28,9 @@ namespace data
 	}
 
 	using Cluster = multiset<data::TimeLoc>;
+
+	typedef struct {
+		string name;
+		string type;
+	} Building;
 }

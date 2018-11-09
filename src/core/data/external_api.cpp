@@ -13,8 +13,10 @@ void data::api_query() {
 }
 
 
-data::Building* data::get_building(data::LocPoint lp, float radius)
+data::Building data::get_building(data::LocPoint lp, float radius)
 {
+	Building building;
+
 	// Compose the Overpass query
 	string query = fmt::format(
 		"[out:json][timeout:10];"
@@ -29,22 +31,29 @@ data::Building* data::get_building(data::LocPoint lp, float radius)
 
 	if(res == nullptr) {
 		cout << "API query failed on " << api_url << ":" << endl << query << endl;
-		return nullptr;
+		building.name = "";
+		building.type = "error";
+		return building;
 	}
 
+	// DEBUG
 	// cout << res->body << endl;
 
 	json json_data = json::parse(res->body);
 
-	Building* building = new Building;
-	if(json_data["elements"].size() >= 1) {
-		building->name = json_data["elements"][0]["tags"]["name"].get<std::string>();
-		building->type = json_data["elements"][0]["tags"]["building"].get<std::string>();
-	}
-	else {
-		building->name = "";
-		building->type = "unknown";
+	for(uint i = 0; i < json_data["elements"].size(); i++)
+	{
+		json tags = json_data["elements"][i]["tags"];
+		building.type = tags["building"].get<std::string>();
+		if(tags.find("name") != tags.end())
+			building.name = tags["name"].get<std::string>();
+		else
+			building.name = "";
+		if(building.type != "yes")
+			return building;
 	}
 	
+	building.name = "";
+	building.type = "unknown";
 	return building;
 }
