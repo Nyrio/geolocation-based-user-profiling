@@ -4,14 +4,15 @@
 #include "LocPoint.h"
 #include "external_api.h"
 #include "rawdata.h"
+#include "workflow.h"
 
 using namespace std;
 
 services::Core::Core()
 {
 	std::cout << "Core created" << std::endl;
-
-	// do stuff
+	
+	data::WorkflowParam w = data::loadParam();
 }
 
 
