@@ -18,4 +18,4 @@ api: clear-main
 	echo "Compiling API"
 
 clear-main:
-	- rm $(patsubst %, $(BUILD_DIR)/%, $(MAIN_OBJ))
+	rm -f $(patsubst %, $(BUILD_DIR)/%, $(MAIN_OBJ))

@@ -2,11 +2,14 @@
 #include <iostream>
 
 #include "LocPoint.h"
+#include "external_api.h"
 #include "rawdata.h"
 
-services::Core::Core(std::string parameterFile)
+using namespace std;
+
+services::Core::Core(string parameterFile)
 {
-	std::cout << "Core created" << std::endl;
+	cout << "Core created" << endl;
 
 	// load workflow
 	if(parameterFile.compare("")==0)
