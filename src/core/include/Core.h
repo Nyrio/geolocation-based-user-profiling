@@ -1,12 +1,17 @@
 #pragma once
 
+#include "workflow.h"
+
 namespace services 
 {
 	class Core
 	{
 	public:
-		Core();
+		Core(std::string parameterFile = "");
 		~Core();
+
+	protected:
+		data::WorkflowParam wp;
 	};
 
 }

@@ -12,7 +12,6 @@ data::WorkflowParam data::loadParam(std::string file)
     std::ifstream myfile(file);
     if (myfile.is_open())
     {
-        std::cout<<"open "<<file<<std::endl;
         while (getline(myfile, line))
         {
             data::parseWorkflow(w, line);

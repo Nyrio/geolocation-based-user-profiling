@@ -3,16 +3,19 @@
 
 #include "LocPoint.h"
 #include "rawdata.h"
-#include "workflow.h"
 
-services::Core::Core()
+services::Core::Core(std::string parameterFile)
 {
 	std::cout << "Core created" << std::endl;
-	
-	data::WorkflowParam w = data::loadParam();
+
+	// load workflow
+	if(parameterFile.compare("")==0)
+		wp = data::loadParam();
+	else
+		wp = data::loadParam(parameterFile);
 }
-
-
+ 
+ 
 services::Core::~Core()
 {
 }
