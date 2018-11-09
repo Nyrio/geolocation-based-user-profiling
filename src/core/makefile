@@ -10,8 +10,9 @@ api:
 	echo "TODO"
 
 common:
-	echo "Compiling data and services layers"
+	echo "Compiling libs, data and services layers"
 	mkdir -p build
+	$(MAKE) -C lib
 	$(MAKE) -C data
 	$(MAKE) -C services
 
