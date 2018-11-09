@@ -7,9 +7,6 @@
 services::Core::Core()
 {
 	std::cout << "Core created" << std::endl;
-
-	data::LocPoint p1(1,2);	
-	data::rawdata_query(4);
 }
 
 
