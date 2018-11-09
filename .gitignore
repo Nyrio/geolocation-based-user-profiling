@@ -1,5 +1,6 @@
 # binaries
 bin/
+cli
 *.exe
 src/core/build/
 

@@ -7,8 +7,6 @@ namespace services
 	public:
 		Core();
 		~Core();
-
-		void do_stuff();
 	};
 
 }
