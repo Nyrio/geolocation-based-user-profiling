@@ -1,17 +1,17 @@
 #pragma once
-#include "..\..\lib\data\db\influxdb.hpp"
+#include "influxdb.hpp"
 #include <string>
 #include <vector>
-#include <pair>
+#include <utility>
 using namespace std;
-class InputDataIO {
+namespace data{
+class InfluxWrapper {
 
 public:
-  InputDataIO(string serverAddress_p,int serverPort_p,string userName_p, string userPwd_p);
-  virtual ~InputDataIO();
+  InfluxWrapper(string serverAddress_p,int serverPort_p,string userName_p, string userPwd_p);
+  virtual ~InfluxWrapper();
   /**
   * add a new entry to the influx db
-  * TODO method for dynamic params
   */
   void writeEntry(long timestamp,string measurement, vector<pair<string,string>>& tags, vector<pair<string,string>>& fields);
   /**
@@ -28,3 +28,4 @@ private:
   const string dbName="db";
   influxdb_cpp::server_info serverInfo;
 };
+}
