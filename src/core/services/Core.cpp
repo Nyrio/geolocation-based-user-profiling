@@ -43,17 +43,25 @@ time_t create_date(int day, int month, int year, int hours = 0,
 }
 
 
-void services::Core::do_stuff()
+void services::Core::test_cluster_features()
 {
 	data::Cluster cluster = {
-		{{ 2, 1 }, create_date(29, 4, 2018, 10)},
-		{{ 1, 358 }, create_date(28, 4, 2018)},
-		{{ 1, 2 }, create_date(1, 5, 2018, 18, 30)},
-		{{ -3, 359 }, create_date(30, 4, 2018)}
+		{{ 45.769, 4.832 }, create_date(29, 4, 2018, 10, 11)},
+		{{ 45.770, 4.831 }, create_date(29, 4, 2018, 10, 19)},
+		{{ 45.768, 4.833 }, create_date(29, 4, 2018, 10, 20)},
+		{{ 45.771, 4.834 }, create_date(29, 4, 2018, 10, 35)},
+		{{ 45.769, 4.834 }, create_date(29, 4, 2018, 10, 40)},
+		{{ 45.767, 4.835 }, create_date(29, 4, 2018, 10, 47)},
+		{{ 45.768, 4.832 }, create_date(29, 4, 2018, 10, 53)},
+		{{ 45.767, 4.831 }, create_date(29, 4, 2018, 11, 02)}
 	};
 	data::LocPoint lp = services::cluster_centroid(cluster);
 	cout << lp.lat << " " << lp.lon << endl;
 
-	double hours = services::get_cluster_hours_spent(cluster);
-	cout << hours << endl;
+	vector<data::Cluster> clusters = divide_cluster(cluster, 10);
+
+	for(auto subcl: clusters) {
+		double hours = services::get_cluster_hours_spent(subcl);
+		cout << hours << endl;
+	}
 }

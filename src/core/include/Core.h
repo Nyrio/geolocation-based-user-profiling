@@ -10,7 +10,7 @@ namespace services
 		Core(std::string parameterFile = "");
 		~Core();
 
-		void do_stuff();
+		void test_cluster_features();
 
 	protected:
 		data::WorkflowParam wp;

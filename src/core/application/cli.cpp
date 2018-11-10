@@ -24,7 +24,7 @@ int main(int argc, char* argv[]) {
 
 
 	services::Core c(wp);
-	c.do_stuff();
+	c.test_cluster_features();
 
 	return 0;
 }
