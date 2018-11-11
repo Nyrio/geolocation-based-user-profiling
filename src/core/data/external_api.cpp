@@ -41,7 +41,7 @@ data::Building data::get_building(data::LocPoint lp, float radius)
 
 	json json_data = json::parse(res->body);
 
-	for(uint i = 0; i < json_data["elements"].size(); i++)
+	for(unsigned int i = 0; i < json_data["elements"].size(); i++)
 	{
 		json tags = json_data["elements"][i]["tags"];
 		building.type = tags["building"].get<std::string>();
