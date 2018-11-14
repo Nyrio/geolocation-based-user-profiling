@@ -1,9 +1,10 @@
 #pragma once
 
-namespace data 
+namespace data
 {
 	class LocPoint
 	{
+		friend class DJCluster;
 	public:
 		LocPoint(double lat, double longi);
 		~LocPoint();
@@ -11,6 +12,9 @@ namespace data
     protected:
         double lat;
         double longi;
+			private:
+				long idClustering=-1;
+
 	};
 
 }
