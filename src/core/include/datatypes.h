@@ -2,6 +2,8 @@
 #include <string>
 #include <ctime>
 #include <set>
+#include <deque>
+
 
 using namespace std;
 
@@ -27,7 +29,8 @@ namespace data
 			return false;
 	}
 
-	using Cluster = multiset<data::TimeLoc>;
+	using PointSet = multiset<data::TimeLoc>;
+	using Cluster = PointSet;
 
 	typedef struct {
 		string name;
