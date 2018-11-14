@@ -1,14 +1,18 @@
 #pragma once
 
-#include "LocPoint.h"
+#include "datatypes.h"
 
 #include <deque>
+#include <ctime>
+
+using namespace std;
 
 namespace data
 {
 	struct UserData {
 		int id;
-		std::deque<std::pair<LocPoint, LocPoint>> list;
+		deque<pair<LocPoint, time_t>> list;
 	};
-	void rawdata_query(int id);
+	UserData rawdata_query(int id);
+	UserData rawdata_query(int id, time_t t1, time_t t2);
 }
