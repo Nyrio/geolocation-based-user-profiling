@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <cstring>
 #include <cstdio>
@@ -14,6 +15,7 @@
     }
 #else
     #include <unistd.h>
+    #include <sys/uio.h>
     #include <sys/types.h>
     #include <sys/socket.h>
     #include <netinet/in.h>
