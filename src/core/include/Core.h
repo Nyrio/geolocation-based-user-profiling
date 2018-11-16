@@ -2,7 +2,7 @@
 
 #include "workflow.h"
 
-namespace services 
+namespace services
 {
 	class Core
 	{
@@ -11,6 +11,7 @@ namespace services
 		~Core();
 
 		void test_cluster_features();
+		void testDJClustering();
 
 	protected:
 		data::WorkflowParam wp;

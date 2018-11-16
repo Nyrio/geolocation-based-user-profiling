@@ -20,8 +20,8 @@ services::Core::Core(string parameterFile)
 	else
 		wp = data::loadParam(parameterFile);
 }
- 
- 
+
+
 services::Core::~Core()
 {
 }
@@ -42,4 +42,9 @@ void services::Core::test_cluster_features()
 		double hours = services::get_cluster_hours_spent(subcl);
 		cout << hours << endl;
 	}
+
+}
+void services::Core::testDJClustering(){
+	data::PointSet cluster =
+		data::get_locations(1);
 }

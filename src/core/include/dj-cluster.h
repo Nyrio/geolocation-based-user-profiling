@@ -37,6 +37,8 @@ namespace services{
     */
     vector<ClusterWrapper*> run(float epsilon,int minPts,TimeLocWrapper & center, float radius);
   private:
+    void preprocessing(data::PointSet &points);
+    void cleanTree();
     void neighbours(TimeLocWrapper * point,float epsilon,int minPts,vector<TimeLocWrapper>& neighbours);
     ClusterWrapper* getClusterJoinable(vector<services::TimeLocWrapper>& neighbours,vector<services::ClusterWrapper*>& clusters,float epsilon);
     ClusterWrapper* getClusterJoinable(Cluster& neighbours,vector<services::ClusterWrapper*>& clusters,float epsilon);

@@ -22,6 +22,8 @@ services::DJCluster::~DJCluster(){
   tree->RemoveAll();
   delete tree;
 }
+void services::DJCluster::cleanTree(){
+}
 vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int minPts,services::TimeLocWrapper & center, float radius){
   idCurrentClustering++;
   vector<services::ClusterWrapper*> clusters;
@@ -51,6 +53,7 @@ vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int min
   return clusters;
 }
 void services::DJCluster::load(PointSet points){
+  preprocessing(points);
   tree->RemoveAll();
   double min[] = {0,0};
   double max[] = {0,0};
@@ -64,6 +67,9 @@ void services::DJCluster::load(PointSet points){
     wrapper->point = point;
     tree->Insert(min,max,wrapper);
   }
+}
+void services::DJCluster::preprocessing(PointSet &points){
+
 }
 void services::DJCluster::neighbours(services::TimeLocWrapper * point,float epsilon,int minPts,vector<services::TimeLocWrapper> &neighbours){
   double min[] = {point->point.loc.lat-epsilon,point->point.loc.lon-epsilon};
