@@ -1,7 +1,9 @@
+#include "workflow.h"
 #include <iostream>
 #include <fstream>
+#include "string_utils.h"
 
-#include "workflow.h"
+using namespace std;
 
 data::WorkflowParam data::loadParam(std::string file)
 {
@@ -31,7 +33,9 @@ void data::resetWorkflow(WorkflowParam &w){
     w.eps = 0.0002;
     w.minPts = 20;
 
-    w.buildingRadius = 5.;
+    w.searchRadius = 10.;
+    w.sepMinutes = 10.;
+    w.placeTypes = vector<string>();
 }
 
 void data::parseWorkflow(WorkflowParam &w, std::string s)
@@ -43,12 +47,16 @@ void data::parseWorkflow(WorkflowParam &w, std::string s)
         std::string value = s.substr(s.find(delim) + delim.length(), s.length());
 
         // different parameters expected
-        if (name.compare("eps") == 0) {
+        if (name == "eps") {
             w.eps = std::stod(value);
-        } else if (name.compare("min_pts") == 0) {
+        } else if (name == "min_pts") {
             w.minPts = std::stoi(value);
-        } else if (name.compare("building_range") == 0) {
-            w.buildingRadius = std::stof(value);
+        } else if (name == "search_radius") {
+            w.searchRadius = std::stof(value);
+        } else if (name == "sep_minutes") {
+            w.sepMinutes = std::stof(value);
+        } else if (name == "place_types") {
+            w.placeTypes = split(value, ',');
         }
     }
 }

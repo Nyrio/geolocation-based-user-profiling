@@ -1,8 +1,8 @@
 #include <iostream>
 #include <vector>
-#include <sstream>
 #include <string.h>
 #include "Core.h"
+#include "string_utils.h"
 
 using namespace std;
 
@@ -47,18 +47,6 @@ int main(int argc, char *argv[])
 	}
 
 	return 0;
-}
-
-vector<string> split(const string &s, char delim)
-{
-	stringstream ss(s);
-	string item;
-	vector<string> elems;
-	while (getline(ss, item, delim))
-	{
-		elems.push_back(item);
-	}
-	return elems;
 }
 
 void execute(services::Core &c, const string &s)

@@ -31,12 +31,19 @@ In this file the format is :
 Empty lines and lines begining with *#* are ignored (considered as comments).
 Example : 
 ```
-# Clustering parameters
+# DJ parameters
 eps=0.0002
 min_pts=20
 
-# Building range accuracy
-building_range=5.
+# Radius of search of an amenity around coordinates
+search_radius=10.
+
+# Interval in minutes between two points to consider them in different
+# unique visites
+sep_minutes=10.
+
+# OpenStreetMap attributes to consider when tagging a position
+place_types=amenity,leisure,tourism,building
 ```
 
 ## External API

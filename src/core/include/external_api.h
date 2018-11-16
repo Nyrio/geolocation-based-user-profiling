@@ -1,10 +1,12 @@
 #pragma once
 #include <string>
+#include <set>
 #include "datatypes.h"
+#include "workflow.h"
 
 using namespace std;
 
 namespace data
 {
-	Building get_building(LocPoint lp, float radius = 5.0f);
+	set<string> get_amenities(const LocPoint& lp, const data::WorkflowParam& wp);
 }

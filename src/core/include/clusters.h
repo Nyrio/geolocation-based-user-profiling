@@ -2,6 +2,7 @@
 #include <ctime>
 #include <vector>
 #include "datatypes.h"
+#include "workflow.h"
 
 using namespace std;
 
@@ -17,9 +18,10 @@ namespace services
 	// Cut the cluster in groups corresponding to a unique visit, with the
 	// criteria that points in the same visit mustn't be separated with
 	// more than sep_mn minutes
-	vector<data::Cluster> divide_cluster(const data::Cluster& cluster, float sep_mn);
+	vector<data::Cluster> divide_cluster(const data::Cluster& cluster,
+		                                 const data::WorkflowParam& wp);
 
 	// TODO: write what this function is doing
 	vector<pair<data::PointOfInterest, vector<data::Visit>>> clusters_visits(
-		const vector<data::Cluster>& clusters, float search_radius, float sep_mn);
+		const vector<data::Cluster>& clusters, const data::WorkflowParam& wp);
 }

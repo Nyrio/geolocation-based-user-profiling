@@ -33,13 +33,8 @@ namespace data
 	using Cluster = PointSet;
 
 	typedef struct {
-		string name;
-		string type;
-	} Building;
-
-	typedef struct {
 		LocPoint centroid;
-		Building building;
+		set<string> amenities;
 	} PointOfInterest;
 
 	typedef struct {
