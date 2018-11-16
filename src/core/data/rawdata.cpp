@@ -1,20 +1,52 @@
 #include "rawdata.h"
 #include <iostream>
+#include <string>
+#include <map>
+#define FMT_HEADER_ONLY
+#include "fmt/format.h"
+#include "time_utils.h"
+#include "InfluxWrapper.hpp"
+#include "json.hpp"
 
 using namespace std;
+using json = nlohmann::json;
 
-map<int, data::PointSet> data::rawdata_query(int id) {
-	// TODO change this to a true call to DB
-	// where ID = id
-	cout << "The raw data says hi" << endl;
-	map<int, PointSet> u;
-	return u;
-}
-map<int, data::PointSet> data::rawdata_query(int id, time_t t1, time_t t2) {
-	// TODO change this to a true call to DB
-	// where ID = id && t1 <= TIMESTAMP <= t2
-	cout << "The raw data says hello" << endl;
-	map<int, PointSet> u;
-	return u;
+
+data::InfluxWrapper * get_wrapper()
+{
+	data::InfluxWrapper * wrapper = new data::InfluxWrapper("127.0.0.1", 8086, "root", "root");
+	return wrapper;
 }
 
+
+data::PointSet data::get_locations(int id, string add_clause)
+{
+	string query = fmt::format(
+		"SELECT \"time\", \"id\", \"lat\", \"lon\""
+		" FROM gps WHERE \"id\" = '{0}' {1};",
+		id, add_clause
+	);
+	InfluxWrapper * wrapper = get_wrapper();
+	json resp = wrapper->query(query);
+
+	data::PointSet ps;
+	for(json location: resp["results"][0]["series"][0]["values"])
+	{
+		TimeLoc tl;
+		tl.t = time_utils::from_rfc3339(location[0].get<string>());
+		tl.loc.lat = location[2].get<double>();
+		tl.loc.lon = location[3].get<double>();
+		ps.insert(tl);
+	}
+
+	return ps;
+}
+
+data::PointSet data::get_locations(int id, time_t t1, time_t t2)
+{
+	string clause = fmt::format(
+		"AND time > '{0}' AND time < '{1}'",
+		time_utils::to_rfc3339(t1), time_utils::to_rfc3339(t2)
+	);
+	return data::get_locations(id, clause);
+}

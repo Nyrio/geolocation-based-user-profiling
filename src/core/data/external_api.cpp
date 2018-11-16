@@ -44,9 +44,9 @@ data::Building data::get_building(data::LocPoint lp, float radius)
 	for(unsigned int i = 0; i < json_data["elements"].size(); i++)
 	{
 		json tags = json_data["elements"][i]["tags"];
-		building.type = tags["building"].get<std::string>();
+		building.type = tags["building"].get<string>();
 		if(tags.find("name") != tags.end())
-			building.name = tags["name"].get<std::string>();
+			building.name = tags["name"].get<string>();
 		else
 			building.name = "";
 		if(building.type != "yes")
