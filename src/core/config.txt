@@ -1,1 +1,6 @@
-param1=test
+# DJ parameters
+eps=0.0002
+min_pts=20
+
+# Building range accuracy
+building_range=5.

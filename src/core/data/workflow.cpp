@@ -28,20 +28,27 @@ data::WorkflowParam data::loadParam(std::string file)
 }
 
 void data::resetWorkflow(WorkflowParam &w){
-    w.param1 = "default param1";
-    w.param2 = 0;
+    w.eps = 0.0002;
+    w.minPts = 20;
+
+    w.buildingRadius = 5.;
 }
 
 void data::parseWorkflow(WorkflowParam &w, std::string s)
 {
-    std::string delim = "=";
-    std::string name = s.substr(0, s.find(delim));
-    std::string value = s.substr(s.find(delim) + delim.length(), s.length());
+    if(s.length() > 1 && s[0] != '#')
+    {
+        std::string delim = "=";
+        std::string name = s.substr(0, s.find(delim));
+        std::string value = s.substr(s.find(delim) + delim.length(), s.length());
 
-    //example params to extends to new parameters
-    if(name.compare("param1") == 0){
-        w.param1 = value;
-    } else if(name.compare("paramNum") == 0) {
-        w.param2 = std::stoi(value);
+        // different parameters expected
+        if (name.compare("eps") == 0) {
+            w.eps = std::stod(value);
+        } else if (name.compare("min_pts") == 0) {
+            w.minPts = std::stoi(value);
+        } else if (name.compare("building_range") == 0) {
+            w.buildingRadius = std::stof(value);
+        }
     }
 }

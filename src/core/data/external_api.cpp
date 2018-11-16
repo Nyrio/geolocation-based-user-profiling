@@ -8,11 +8,6 @@
 using namespace std;
 using json = nlohmann::json;
 
-void data::api_query() {
-	cout << "The external API says hi" << endl;
-}
-
-
 data::Building data::get_building(data::LocPoint lp, float radius)
 {
 	Building building = {"", "unassigned"};
