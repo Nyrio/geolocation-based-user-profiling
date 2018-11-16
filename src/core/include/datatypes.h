@@ -5,13 +5,15 @@
 
 using namespace std;
 
-namespace data 
+namespace data
 {
 	typedef struct {
 		double lat;
 		double lon;
 	} LocPoint;
-
+	inline bool operator==(const LocPoint& lp1, const LocPoint& lp2){
+		return (lp1.lat==lp2.lat && lp1.lon==lp2.lon);
+	}
 	typedef struct {
 		LocPoint loc;
 		time_t t;
