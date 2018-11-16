@@ -4,5 +4,5 @@
 using namespace std;
 
 void data::cache_query() {
-	cout << "The cache says hi" << endl;
+	cout << "The cache says hi, I'm useless for the moment :) :) :)" << endl;
 }
