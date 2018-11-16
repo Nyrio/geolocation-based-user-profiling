@@ -66,10 +66,12 @@ void execute(services::Core &c, const string &s)
 	vector<string> words = split(s, ' ');
 	if (words.size() > 0)
 	{
-		if (words[0].compare("test") == 0)
+		if (words[0].compare("test") == 0 && words.size() >= 2)
 		{
-			// Temp tests, to remove :
-			c.test_cluster_features();
+			if(words[1] == "clusters")
+				c.test_cluster_features();
+			else if(words[1] == "visits")
+				c.test_clusters_visits();
 		}
 		else if (words[0].compare("XXXXXXX") == 0)
 		{
