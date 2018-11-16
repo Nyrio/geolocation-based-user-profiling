@@ -19,25 +19,28 @@ services::DJCluster::DJCluster(){
   tree = new RTree<TimeLocWrapper*,double,2>();
 }
 services::DJCluster::~DJCluster(){
-  tree->RemoveAll();
+  cleanTree();
   delete tree;
 }
 void services::DJCluster::cleanTree(){
+  RTree<TimeLocWrapper*,double,2>::Iterator iterator;
+  tree->GetFirst(iterator);
+  while(!tree->IsNull(iterator)){
+    delete tree->GetAt(iterator);
+    tree->GetNext(iterator);
+  }
+  tree->RemoveAll();
 }
-vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int minPts,services::TimeLocWrapper & center, float radius){
+vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int minPts){
   idCurrentClustering++;
   vector<services::ClusterWrapper*> clusters;
-  double min[] = {center.point.loc.lat-radius,center.point.loc.lon-radius};
-  double max[] = {center.point.loc.lat+radius,center.point.loc.lon+radius};
-  vector<services::TimeLocWrapper*> * points = new vector<services::TimeLocWrapper*>();
-  tree->Search(min,max,[=](services::TimeLocWrapper*p){
-    points->push_back(p);
-    return true;
-  });
-  for(int i = 0;i<points->size();i++){
-    (*points)[i]->idClustering=idCurrentClustering;
+  RTree<TimeLocWrapper*,double,2>::Iterator iterator;
+  tree->GetFirst(iterator);
+  while(!tree->IsNull(iterator)){
+    TimeLocWrapper* point= tree->GetAt(iterator);
+    point->idClustering=idCurrentClustering;
     vector<services::TimeLocWrapper> neighbours;
-    this->neighbours((*points)[i],epsilon,minPts,neighbours);
+    this->neighbours(point,epsilon,minPts,neighbours);
     //no neighbours => noise
     if(neighbours.size()==0){
       //do nothing
@@ -48,8 +51,9 @@ vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int min
         joinClusters(clusters,epsilon);
       }
     }
+    tree->GetNext(iterator);
   }
-  delete points;
+
   return clusters;
 }
 void services::DJCluster::load(PointSet points){
@@ -78,7 +82,7 @@ void services::DJCluster::neighbours(services::TimeLocWrapper * point,float epsi
   float * epsilonPts= &epsilon;
   vector<services::TimeLocWrapper>* nPtr= & neighbours;
   tree->Search(min,max,[=](services::TimeLocWrapper*p){
-    if(*epsilonPts>=sqrt(services::sqr(p->point.loc.lat-point->point.loc.lat)+services::sqr(p->point.loc.lon-point->point.loc.lon))){
+    if((*epsilonPts)*(*epsilonPts)>=services::sqr(p->point.loc.lat-point->point.loc.lat)+services::sqr(p->point.loc.lon-point->point.loc.lon)){
       (*nPtr).push_back(*p);
     }
     return true;
@@ -101,7 +105,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(vector<service
     services::ClusterWrapper** foundPtr= &found;
     for(int j = 0;j<neighbours.size();j++){
       tree->Search(min,max,[=](services::TimeLocWrapper*p){
-        if(*epsPtr>=sqrt(services::sqr(p->point.loc.lat-clusters[i]->center.lat)+services::sqr(p->point.loc.lon-clusters[i]->center.lon)) && neighbours[j]==*p){
+        if((*epsPtr)*(*epsPtr)>=services::sqr(p->point.loc.lat-clusters[i]->center.lat)+services::sqr(p->point.loc.lon-clusters[i]->center.lon) && neighbours[j]==*p){
           *foundPtr=clusters[i];
           return false;//stop the search
         }
@@ -128,8 +132,8 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(Cluster& neigh
     services::ClusterWrapper** foundPtr= &found;
     for(TimeLoc tl : neighbours){
       tree->Search(min,max,[=](services::TimeLocWrapper*p){
-        if(*epsPtr>=sqrt(services::sqr(p->point.loc.lat-clusters[i]->center.lat)+
-        services::sqr(p->point.loc.lon-clusters[i]->center.lon)) && tl.loc==p->point.loc){
+        if((*epsPtr)*(*epsPtr)>=services::sqr(p->point.loc.lat-clusters[i]->center.lat)+
+        services::sqr(p->point.loc.lon-clusters[i]->center.lon) && tl.loc==p->point.loc){
           *foundPtr=clusters[i];
           return false;//stop the search
         }

@@ -35,7 +35,7 @@ namespace services{
     /**
     *no noise in clusters
     */
-    vector<ClusterWrapper*> run(float epsilon,int minPts,TimeLocWrapper & center, float radius);
+    vector<ClusterWrapper*> run(float epsilon,int minPts);
   private:
     void preprocessing(data::PointSet &points);
     void cleanTree();
