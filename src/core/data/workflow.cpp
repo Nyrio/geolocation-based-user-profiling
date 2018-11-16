@@ -42,7 +42,7 @@ void data::parseWorkflow(WorkflowParam &w, std::string s)
         std::string name = s.substr(0, s.find(delim));
         std::string value = s.substr(s.find(delim) + delim.length(), s.length());
 
-        //example params to extends to new parameters
+        // different parameters expected
         if (name.compare("eps") == 0) {
             w.eps = std::stod(value);
         } else if (name.compare("min_pts") == 0) {

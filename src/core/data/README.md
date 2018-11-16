@@ -31,7 +31,7 @@ In this file the format is :
 Empty lines and lines begining with *#* are ignored (considered as comments).
 Example : 
 ```
-# DB Scan parameters
+# Clustering parameters
 eps=0.0002
 min_pts=20
 
