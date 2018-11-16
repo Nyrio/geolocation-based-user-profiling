@@ -15,7 +15,7 @@ void data::api_query() {
 
 data::Building data::get_building(data::LocPoint lp, float radius)
 {
-	Building building;
+	Building building = {"", "unassigned"};
 
 	// Compose the Overpass query
 	string query = fmt::format(
@@ -31,8 +31,7 @@ data::Building data::get_building(data::LocPoint lp, float radius)
 
 	if(res == nullptr) {
 		cout << "API query failed on " << api_url << ":" << endl << query << endl;
-		building.name = "";
-		building.type = "error";
+		building = {"", "error"};
 		return building;
 	}
 
@@ -53,7 +52,6 @@ data::Building data::get_building(data::LocPoint lp, float radius)
 			return building;
 	}
 	
-	building.name = "";
-	building.type = "unknown";
+	building = {"", "unknown"};
 	return building;
 }

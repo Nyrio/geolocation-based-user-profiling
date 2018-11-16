@@ -11,6 +11,7 @@ namespace services
 		~Core();
 
 		void test_cluster_features();
+		void test_clusters_visits();
 
 	protected:
 		data::WorkflowParam wp;

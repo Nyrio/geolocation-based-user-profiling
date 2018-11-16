@@ -39,6 +39,7 @@ data::PointSet data::get_locations(int id, string add_clause)
 		ps.insert(tl);
 	}
 
+	delete wrapper;
 	return ps;
 }
 

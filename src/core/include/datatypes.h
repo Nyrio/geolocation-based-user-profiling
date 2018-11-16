@@ -36,4 +36,14 @@ namespace data
 		string name;
 		string type;
 	} Building;
+
+	typedef struct {
+		LocPoint centroid;
+		Building building;
+	} PointOfInterest;
+
+	typedef struct {
+		time_t start;
+		time_t end;
+	} Visit;
 }
