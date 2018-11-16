@@ -4,7 +4,7 @@
 
 services::ClusterWrapper::ClusterWrapper(vector<services::TimeLocWrapper> & points){
   for(int i = 0;i<points.size();i++){
-    this->cluster.insert(points[i]);
+    this->cluster.insert(points[i].point);
   }
 }
 services::ClusterWrapper::~ClusterWrapper(){
@@ -16,7 +16,7 @@ void services::ClusterWrapper::fusion(services::ClusterWrapper* other){
   this->center=services::cluster_centroid(other->cluster);
 }
 services::DJCluster::DJCluster(){
-  tree = new RTree();
+  tree = new RTree<TimeLocWrapper*,double,2>();
 }
 services::DJCluster::~DJCluster(){
   tree->RemoveAll();
@@ -25,8 +25,8 @@ services::DJCluster::~DJCluster(){
 vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int minPts,services::TimeLocWrapper & center, float radius){
   idCurrentClustering++;
   vector<services::ClusterWrapper*> clusters;
-  double min[] = {center.point.lat-radius,center.point.lon-radius};
-  double max[] = {center.point.lat+radius,center.point.lon+radius};
+  double min[] = {center.point.loc.lat-radius,center.point.loc.lon-radius};
+  double max[] = {center.point.loc.lat+radius,center.point.loc.lon+radius};
   vector<services::TimeLocWrapper*> * points = new vector<services::TimeLocWrapper*>();
   tree->Search(min,max,[=](services::TimeLocWrapper*p){
     points->push_back(p);
@@ -52,18 +52,27 @@ vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int min
 }
 void services::DJCluster::load(PointSet points){
   tree->RemoveAll();
+  double min[] = {0,0};
+  double max[] = {0,0};
+
   for(auto point: points){
-    tree->Insert(min,max,&point);
+    min[0]=point.loc.lat;
+    min[1]=point.loc.lon;
+    max[0]=point.loc.lat;
+    max[1]=point.loc.lon;
+    TimeLocWrapper * wrapper = new TimeLocWrapper();
+    wrapper->point = point;
+    tree->Insert(min,max,wrapper);
   }
 }
 void services::DJCluster::neighbours(services::TimeLocWrapper * point,float epsilon,int minPts,vector<services::TimeLocWrapper> &neighbours){
-  double min[] = {point->point.lat-epsilon,point->point.lon-epsilon};
-  double max[] = {point->point.lat+epsilon,point->point.lon+epsilon};
+  double min[] = {point->point.loc.lat-epsilon,point->point.loc.lon-epsilon};
+  double max[] = {point->point.loc.lat+epsilon,point->point.loc.lon+epsilon};
   neighbours.push_back(*point);
   float * epsilonPts= &epsilon;
   vector<services::TimeLocWrapper>* nPtr= & neighbours;
   tree->Search(min,max,[=](services::TimeLocWrapper*p){
-    if(*epsilonPts>=sqrt(services::sqr(p->point.lat-point->point.lat)+services::sqr(p->point.lon-point->point.lon))){
+    if(*epsilonPts>=sqrt(services::sqr(p->point.loc.lat-point->point.loc.lat)+services::sqr(p->point.loc.lon-point->point.loc.lon))){
       (*nPtr).push_back(*p);
     }
     return true;
@@ -86,7 +95,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(vector<service
     services::ClusterWrapper** foundPtr= &found;
     for(int j = 0;j<neighbours.size();j++){
       tree->Search(min,max,[=](services::TimeLocWrapper*p){
-        if(*epsPtr>=sqrt(services::sqr(p->point.lat-clusters[i]->center.lat)+services::sqr(p->point.lon-clusters[i]->center.lon)) && neighbours[j]==*p){
+        if(*epsPtr>=sqrt(services::sqr(p->point.loc.lat-clusters[i]->center.lat)+services::sqr(p->point.loc.lon-clusters[i]->center.lon)) && neighbours[j]==*p){
           *foundPtr=clusters[i];
           return false;//stop the search
         }
@@ -113,8 +122,8 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(Cluster& neigh
     services::ClusterWrapper** foundPtr= &found;
     for(TimeLoc tl : neighbours){
       tree->Search(min,max,[=](services::TimeLocWrapper*p){
-        if(*epsPtr>=sqrt(services::sqr(p->point.lat-clusters[i]->center.lat)+
-        services::sqr(p->point.lon-clusters[i]->center.lon)) && tl.loc==p->point){
+        if(*epsPtr>=sqrt(services::sqr(p->point.loc.lat-clusters[i]->center.lat)+
+        services::sqr(p->point.loc.lon-clusters[i]->center.lon)) && tl.loc==p->point.loc){
           *foundPtr=clusters[i];
           return false;//stop the search
         }
