@@ -1,3 +1,8 @@
+# private data files
+privamov-gps
+privamov-gsm
+privamov-wifi
+
 # binaries
 bin/
 cli
@@ -13,3 +18,4 @@ Desktop.ini
 # editors
 *~
 .vscode/
+

@@ -30,6 +30,8 @@ data::WorkflowParam data::loadParam(std::string file)
 void data::resetWorkflow(WorkflowParam &w){
     w.param1 = "default param1";
     w.param2 = 0;
+    w.eps = 0.0002;
+    w.minPts = 20;
 }
 
 void data::parseWorkflow(WorkflowParam &w, std::string s)
@@ -43,5 +45,9 @@ void data::parseWorkflow(WorkflowParam &w, std::string s)
         w.param1 = value;
     } else if(name.compare("paramNum") == 0) {
         w.param2 = std::stoi(value);
+    } else if (name.compare("eps") == 0) {
+        w.eps = std::stod(value);
+    } else if (name.compare("minPts") == 0) {
+        w.minPts = std::stoi(value);
     }
 }
