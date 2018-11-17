@@ -2,6 +2,8 @@
 #include <string>
 #include <ctime>
 #include <set>
+#include <iostream>
+
 #include <deque>
 
 
@@ -15,6 +17,10 @@ namespace data
 	} LocPoint;
 	inline bool operator==(const LocPoint& lp1, const LocPoint& lp2){
 		return (lp1.lat==lp2.lat && lp1.lon==lp2.lon);
+	}
+	inline ostream& operator<<(ostream& os, const LocPoint& lp2){
+		os<<"lat: "<<lp2.lat<<" lng: "<<lp2.lon;
+		return os;
 	}
 	typedef struct {
 		LocPoint loc;

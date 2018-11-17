@@ -24,7 +24,10 @@ int main(int argc, char* argv[]) {
 
 
 	services::Core c(wp);
-	c.test_cluster_features();
+	//tests
+
+	//c.test_cluster_features();
+	c.testDJClustering();
 
 	return 0;
 }

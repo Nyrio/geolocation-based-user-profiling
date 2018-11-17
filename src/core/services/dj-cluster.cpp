@@ -1,19 +1,24 @@
 #include "../include/dj-cluster.h"
 #include <cmath>
-#include "../include/clusters.h"
+#include <iostream>
 
+#include "../include/clusters.h"
+#define DEBUG_MODE 0
 services::ClusterWrapper::ClusterWrapper(vector<services::TimeLocWrapper> & points){
   for(int i = 0;i<points.size();i++){
     this->cluster.insert(points[i].point);
   }
+  this->center=services::cluster_centroid(this->cluster);
 }
 services::ClusterWrapper::~ClusterWrapper(){
 }
 void services::ClusterWrapper::fusion(services::ClusterWrapper* other){
   for(auto data: other->cluster){
-    this->cluster.insert(data);
+    if(this->cluster.count(data)==0){
+      this->cluster.insert(data);
+    }
   }
-  this->center=services::cluster_centroid(other->cluster);
+  this->center=services::cluster_centroid(this->cluster);
 }
 services::DJCluster::DJCluster(){
   tree = new RTree<TimeLocWrapper*,double,2>();
@@ -31,32 +36,46 @@ void services::DJCluster::cleanTree(){
   }
   tree->RemoveAll();
 }
-vector<services::ClusterWrapper*> services::DJCluster::run(float epsilon,int minPts){
+vector<data::Cluster*> services::DJCluster::run(float epsilon,int minPts){
+  if(DEBUG_MODE) cout<<"run dj clustering"<<endl;
+
   idCurrentClustering++;
   vector<services::ClusterWrapper*> clusters;
   RTree<TimeLocWrapper*,double,2>::Iterator iterator;
   tree->GetFirst(iterator);
   while(!tree->IsNull(iterator)){
     TimeLocWrapper* point= tree->GetAt(iterator);
-    point->idClustering=idCurrentClustering;
+    if(DEBUG_MODE) cout<<"point: "<<point->point.t<<endl;
+
     vector<services::TimeLocWrapper> neighbours;
     this->neighbours(point,epsilon,minPts,neighbours);
     //no neighbours => noise
     if(neighbours.size()==0){
       //do nothing
+      if(DEBUG_MODE) cout<<"noise"<<endl;
     }else {
+      if(DEBUG_MODE) cout<<"new cluster: "<<neighbours.size()<<endl;
+
       services::ClusterWrapper * cluster = new services::ClusterWrapper(neighbours);
-      clusters.push_back(cluster);
       if(this->getClusterJoinable(neighbours,clusters,epsilon)){
+        if(DEBUG_MODE) cout<<"cluster joinables"<<endl;
+        clusters.push_back(cluster);
         joinClusters(clusters,epsilon);
+      }else{
+        if(DEBUG_MODE) cout<<"append cluster"<<endl;
+        clusters.push_back(cluster);
       }
     }
     tree->GetNext(iterator);
   }
-
-  return clusters;
+  vector<data::Cluster*> output;
+  for(int i = 0;i<clusters.size();i++){
+    output.push_back(&clusters[i]->cluster);
+  }
+  return output;
 }
 void services::DJCluster::load(PointSet points){
+  if(DEBUG_MODE) cout<<"load in rtree"<<endl;
   preprocessing(points);
   tree->RemoveAll();
   double min[] = {0,0};
@@ -78,12 +97,13 @@ void services::DJCluster::preprocessing(PointSet &points){
 void services::DJCluster::neighbours(services::TimeLocWrapper * point,float epsilon,int minPts,vector<services::TimeLocWrapper> &neighbours){
   double min[] = {point->point.loc.lat-epsilon,point->point.loc.lon-epsilon};
   double max[] = {point->point.loc.lat+epsilon,point->point.loc.lon+epsilon};
-  neighbours.push_back(*point);
   float * epsilonPts= &epsilon;
   vector<services::TimeLocWrapper>* nPtr= & neighbours;
   tree->Search(min,max,[=](services::TimeLocWrapper*p){
+
     if((*epsilonPts)*(*epsilonPts)>=services::sqr(p->point.loc.lat-point->point.loc.lat)+services::sqr(p->point.loc.lon-point->point.loc.lon)){
       (*nPtr).push_back(*p);
+      if(DEBUG_MODE) cout<<"is in espilon("<<epsilon<<"): "<<p->point.loc<<endl;
     }
     return true;
   });
@@ -97,18 +117,25 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(vector<service
   double max[] = {0,0};
   services::ClusterWrapper* found=nullptr;
   for(int i = 0;i<clusters.size();i++){
+    if(DEBUG_MODE) cout<<"cluster("<<i<<"): "<<clusters[i]->cluster.size()<<" center:"<<clusters[i]->center<<endl;
     min[0]=clusters[i]->center.lat-epsilon;
     min[1]=clusters[i]->center.lon-epsilon;
     max[0]=clusters[i]->center.lat+epsilon;
     max[1]=clusters[i]->center.lon+epsilon;
+    if(DEBUG_MODE) cout<<"min: "<<min[0]<<" "<<min[1]<<endl;
+    if(DEBUG_MODE) cout<<"max: "<<max[0]<<" "<<max[1]<<endl;
+
     float * epsPtr=&epsilon;
     services::ClusterWrapper** foundPtr= &found;
     for(int j = 0;j<neighbours.size();j++){
       tree->Search(min,max,[=](services::TimeLocWrapper*p){
+        if(DEBUG_MODE) cout<<"point found: "<<p->point.loc<<endl;
         if((*epsPtr)*(*epsPtr)>=services::sqr(p->point.loc.lat-clusters[i]->center.lat)+services::sqr(p->point.loc.lon-clusters[i]->center.lon) && neighbours[j]==*p){
           *foundPtr=clusters[i];
+          if(DEBUG_MODE) cout<<"found cluster"<<endl;
           return false;//stop the search
         }
+        if(DEBUG_MODE) cout<<"continue"<<endl;
         return true;
       });
 
@@ -119,7 +146,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(vector<service
   }
   return found;
 }
-services::ClusterWrapper* services::DJCluster::getClusterJoinable(Cluster& neighbours,vector<services::ClusterWrapper*>& clusters,float epsilon){
+services::ClusterWrapper* services::DJCluster::getClusterJoinable(Cluster& cluster,vector<services::ClusterWrapper*>& clusters,float epsilon){
   double min[] = {0,0};
   double max[] = {0,0};
   services::ClusterWrapper* found=nullptr;
@@ -130,7 +157,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(Cluster& neigh
     max[1]=clusters[i]->center.lon+epsilon;
     float * epsPtr=&epsilon;
     services::ClusterWrapper** foundPtr= &found;
-    for(TimeLoc tl : neighbours){
+    for(TimeLoc tl : cluster){
       tree->Search(min,max,[=](services::TimeLocWrapper*p){
         if((*epsPtr)*(*epsPtr)>=services::sqr(p->point.loc.lat-clusters[i]->center.lat)+
         services::sqr(p->point.loc.lon-clusters[i]->center.lon) && tl.loc==p->point.loc){
@@ -150,7 +177,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(Cluster& neigh
 void services::DJCluster::joinClusters(vector<services::ClusterWrapper*>& clusters,float epsilon){
   for(int i = 0;i<clusters.size();i++){
     services::ClusterWrapper *c=getClusterJoinable(clusters[i]->cluster,clusters,epsilon);
-    if(c){
+    if(c && c!=clusters[i]){
       c->fusion(clusters[i]);
       delete clusters[i];
       clusters[i]=clusters[clusters.size()-1];
