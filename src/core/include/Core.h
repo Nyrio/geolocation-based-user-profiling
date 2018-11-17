@@ -10,6 +10,10 @@ namespace services
 		Core(std::string parameterFile = "");
 		~Core();
 
+
+		/*
+			Some hardcoded tests
+		*/
 		void test_cluster_features();
 		void testDJClustering();
 		void test_clusters_visits();
