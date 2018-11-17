@@ -17,7 +17,8 @@ set<string> data::get_amenities(const data::LocPoint& lp, const data::WorkflowPa
 	string filters = str_join(wp.placeTypes, "|");
 	string query = fmt::format(
 		"[out:json][timeout:10];"
-		" way(around:{2},{0},{1})[~'^({3})?$'~'.'];"
+		" (way(around:{2},{0},{1})[~'^({3})?$'~'.'];"
+		"  node(around:{2},{0},{1})[~'^({3})?$'~'.'];);"
 		" out tags;",
 		lp.lat, lp.lon, wp.searchRadius, filters
 	);

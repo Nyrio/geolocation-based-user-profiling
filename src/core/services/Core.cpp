@@ -46,13 +46,15 @@ void services::Core::test_cluster_features()
 
 void services::Core::test_clusters_visits()
 {
+	// These are not real clusters yet...
+
 	data::PointSet cluster1 =
-		data::get_locations(1, time_utils::create_date(4, 10, 2014, 9, 0, 0),
-		                       time_utils::create_date(4, 10, 2014, 10, 0, 0));
+		data::get_locations(1, time_utils::create_date(8, 10, 2014, 7, 0, 0),
+		                       time_utils::create_date(8, 10, 2014, 8, 0, 0));
 
 	data::PointSet cluster2 =
-		data::get_locations(1, time_utils::create_date(4, 10, 2014, 10, 30, 0),
-		                       time_utils::create_date(4, 10, 2014, 11, 30, 0));
+		data::get_locations(1, time_utils::create_date(9, 10, 2014, 7, 30, 0),
+		                       time_utils::create_date(9, 10, 2014, 8, 30, 0));
 
 	vector<data::Cluster> clusters = {cluster1, cluster2};
 
