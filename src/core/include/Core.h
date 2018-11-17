@@ -12,6 +12,7 @@ namespace services
 
 		void test_cluster_features();
 		void testDJClustering();
+		void test_clusters_visits();
 
 	protected:
 		data::WorkflowParam wp;

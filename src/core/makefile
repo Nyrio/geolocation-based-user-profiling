@@ -1,5 +1,5 @@
-VERSION = -std=c++11
-CFLAGS = -Wall
+export VERSION = -std=c++11
+export CFLAGS = -Wall
 
 
 cli: common

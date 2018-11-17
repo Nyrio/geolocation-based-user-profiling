@@ -1,6 +1,3 @@
-VERSION = -std=c++11
-CFLAGS = -Wall
-
 BUILD_DIR = ../build
 LIB_DIR = ../lib
 INCLUDE_DIR = ../include
@@ -16,7 +13,7 @@ endif
 cli: clear-main
 	echo "Compiling CLI"
 	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/cli.o cli.cpp
-	g++ $(VERSION) -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES) $(OSFLAG)
+	g++ $(VERSION) -pthread -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES) $(OSFLAG)
 
 api: clear-main
 	echo "Compiling API"
