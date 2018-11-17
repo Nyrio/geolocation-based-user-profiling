@@ -56,7 +56,9 @@ void execute(services::Core &c, const string &s)
 	{
 		if (words[0].compare("test") == 0 && words.size() >= 2)
 		{
-			if(words[1] == "clusters")
+			if(words[1] == "clustering")
+				c.testDJClustering();
+			else if(words[1] == "cluster-features")
 				c.test_cluster_features();
 			else if(words[1] == "visits")
 				c.test_clusters_visits();

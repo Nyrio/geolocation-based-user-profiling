@@ -6,6 +6,7 @@
 #include "clusters.h"
 #include "time_utils.h"
 #include "rawdata.h"
+#include "dj-cluster.h"
 
 using namespace std;
 
@@ -19,13 +20,19 @@ services::Core::Core(string parameterFile)
 		wp = data::loadParam();
 	else
 		wp = data::loadParam(parameterFile);
+
+
 }
- 
- 
+
+
 services::Core::~Core()
 {
 }
 
+
+/*
+	Some hardcoded tests
+*/
 
 void services::Core::test_cluster_features()
 {
@@ -43,6 +50,36 @@ void services::Core::test_cluster_features()
 		cout << hours << endl;
 	}
 }
+
+
+void services::Core::testDJClustering()
+{
+	data::PointSet cluster;
+	//data::get_locations(1);
+
+	cluster.insert({{0, 0}, 0});
+	cluster.insert({{0.00001, 0}, 1});
+	cluster.insert({{0.00002, 0}, 2});
+	cluster.insert({{-0.00021, 0}, 3});
+	cluster.insert({{-0.00022, 0}, 4});
+
+	for(auto t:cluster){
+		cout << t.t << " " << t.loc.lat << " " << t.loc.lon << endl;
+	}
+	services::DJCluster djcluster;
+	djcluster.load(cluster);
+	vector<Cluster*> clusters =djcluster.run(0.0002f, 2);
+	for(uint i = 0; i < clusters.size(); i++)
+	{
+		cout << "cluster:" << endl;
+		for(auto point: *clusters[i])
+		{
+			cout << "  timeloc: " << point.t << " "
+			     << point.loc.lat << " " << point.loc.lon << endl;
+		}
+	}
+}
+
 
 void services::Core::test_clusters_visits()
 {
