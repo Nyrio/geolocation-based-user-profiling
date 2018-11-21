@@ -10,6 +10,13 @@ namespace services
 		Core(std::string parameterFile = "");
 		~Core();
 
+		void show_clusters(uint id, time_t t1 = 0, time_t t2 = 0);
+
+		/*
+			Benchmarks
+		*/
+		void benchmark_clustering(uint id, time_t t1, time_t t2,
+	                              uint nbmax, uint nbmes);
 
 		/*
 			Some hardcoded tests

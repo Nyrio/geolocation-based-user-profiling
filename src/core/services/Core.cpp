@@ -1,6 +1,7 @@
 #include "Core.h"
 #include <iostream>
 #include <ctime>
+#include <algorithm>
 
 #include "datatypes.h"
 #include "clusters.h"
@@ -30,6 +31,78 @@ services::Core::~Core()
 }
 
 
+// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-8T08:30:00Z
+void services::Core::show_clusters(uint id, time_t t1, time_t t2)
+{
+	data::PointSet points;
+
+	if(t1 == 0 && t2 == 0) // No time range set
+		points = data::get_locations(1);
+	else
+		points = data::get_locations(1, t1, t2);
+
+	cout << "Got " << points.size() << " points" << endl;
+
+	services::DJCluster djcluster;
+	djcluster.load(points);
+	vector<Cluster> clusters = djcluster.run(0.0002f, 2);
+	cout << "clusters:" << endl;
+	uint pInClusters = 0;
+	for(data::Cluster cluster: clusters)
+	{
+		data::LocPoint centroid = services::cluster_centroid(cluster);
+		pInClusters += cluster.size();
+		cout << "  centroid " << centroid.lat << " " << centroid.lon
+		     << "\t" << cluster.size() << endl;
+	}
+	cout << "Points in clusters: " << pInClusters << endl;
+}
+
+
+/*
+	Benchmarks
+*/
+
+// e.g benchmark clustering 1 2014-10-08T8:00:00Z 2014-10-31T8:30:00Z 10000 10
+void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
+	                                      uint nbmax, uint nbmes)
+{
+	time_t start, end;
+
+	data::PointSet points;
+
+	start = time(nullptr);
+	points = data::get_locations(1, t1, t2);
+	end = time(nullptr);
+
+	cout << "Got " << points.size() << " points in "
+	     << difftime(end, start) << " s" << endl;
+
+	for(uint mesNum = 1; mesNum <= nbmes; mesNum++)
+	{
+		uint sampleSize = mesNum * nbmax / nbmes;
+		if(sampleSize > points.size()) break;
+
+		data::PointSet sample;
+		uint count = 0;
+		for(const data::TimeLoc& tl: points)
+		{
+			sample.insert(tl);
+			count++;
+			if(count == sampleSize) break;
+		}
+
+		services::DJCluster djcluster;
+		djcluster.load(sample);
+		start = time(nullptr);
+		vector<data::Cluster> clusters = djcluster.run(0.0002f, 2);
+		end = time(nullptr);
+		cout << sampleSize << ": " << difftime(end, start)
+		     << " s" << endl;
+	}
+}
+
+
 /*
 	Some hardcoded tests
 */
@@ -54,25 +127,25 @@ void services::Core::test_cluster_features()
 
 void services::Core::testDJClustering()
 {
-	data::PointSet cluster;
+	data::PointSet points;
 	//data::get_locations(1);
 
-	cluster.insert({{0, 0}, 0});
-	cluster.insert({{0.00001, 0}, 1});
-	cluster.insert({{0.00002, 0}, 2});
-	cluster.insert({{-0.00021, 0}, 3});
-	cluster.insert({{-0.00022, 0}, 4});
+	points.insert({{0, 0}, 0});
+	points.insert({{0.00001, 0}, 1});
+	points.insert({{0.00002, 0}, 2});
+	points.insert({{-0.00021, 0}, 3});
+	points.insert({{-0.00022, 0}, 4});
 
-	for(auto t:cluster){
+	for(auto t:points){
 		cout << t.t << " " << t.loc.lat << " " << t.loc.lon << endl;
 	}
 	services::DJCluster djcluster;
-	djcluster.load(cluster);
-	vector<Cluster*> clusters =djcluster.run(0.0002f, 2);
+	djcluster.load(points);
+	vector<Cluster> clusters =djcluster.run(0.0002f, 2);
 	for(uint i = 0; i < clusters.size(); i++)
 	{
 		cout << "cluster:" << endl;
-		for(auto point: *clusters[i])
+		for(auto point: clusters[i])
 		{
 			cout << "  timeloc: " << point.t << " "
 			     << point.loc.lat << " " << point.loc.lon << endl;

@@ -54,7 +54,7 @@ namespace services
 
         // run the algo, returns a list with the clusters found
         // no noise cluster in the list
-        vector<Cluster*> run(float epsilon, uint minPts);
+        vector<Cluster> run(float epsilon, uint minPts);
 
     private:
         // function to preprocess data before the algorithm

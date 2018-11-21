@@ -2,6 +2,7 @@
 #include <vector>
 #include <string.h>
 #include "Core.h"
+#include "time_utils.h"
 #include "string_utils.h"
 
 using namespace std;
@@ -62,6 +63,41 @@ void execute(services::Core &c, const string &s)
 				c.test_cluster_features();
 			else if(words[1] == "visits")
 				c.test_clusters_visits();
+		}
+		else if (words[0].compare("benchmark") == 0 && words.size() >= 2)
+		{
+			if(words[1] == "clustering" && words.size() >= 7)
+			{
+				uint id = stoi(words[2]);
+				time_t t1 = time_utils::from_rfc3339(words[3]);
+				time_t t2 = time_utils::from_rfc3339(words[4]);
+				uint nbmax = stoi(words[5]);
+				uint nbmes = stoi(words[6]);
+				c.benchmark_clustering(id, t1, t2, nbmax, nbmes);
+			}
+		}
+		else if (words[0].compare("show-clusters") == 0)
+		{
+			uint id;
+			time_t t1, t2;
+
+			try
+			{
+				id = stoi(words[1]);
+				if(words.size() >= 4) {
+					t1 = time_utils::from_rfc3339(words[2]);
+					t2 = time_utils::from_rfc3339(words[3]);
+				}
+				else {
+					t1 = 0;
+					t2 = 0;
+				}
+			}
+			catch(...) {
+				cout << "Invalid parameters for show-clusters <uid> [<t1> <t2>]" << endl;
+			}
+
+			c.show_clusters(id, t1, t2);
 		}
 		else if (words[0].compare("XXXXXXX") == 0)
 		{

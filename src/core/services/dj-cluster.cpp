@@ -2,6 +2,7 @@
 #include <cmath>
 #include <iostream>
 #include "clusters.h"
+#include <ctime>
 
 #define DEBUG_MODE 0
 
@@ -59,7 +60,7 @@ void services::DJCluster::cleanTree()
 }
 
 
-vector<data::Cluster*> services::DJCluster::run(float epsilon, uint minPts)
+vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
 {
     if(DEBUG_MODE)
         cout << "run dj clustering" << endl;
@@ -94,10 +95,11 @@ vector<data::Cluster*> services::DJCluster::run(float epsilon, uint minPts)
         }
         tree->GetNext(iterator);
     }
-    vector<data::Cluster*> output;
+    vector<data::Cluster> output;
     for(uint i = 0; i < clusters.size(); i++)
     {
-        output.push_back(&clusters[i]->cluster);
+        output.push_back(clusters[i]->cluster);
+        delete clusters[i];
     }
     return output;
 }

@@ -19,7 +19,7 @@ data::InfluxWrapper * get_wrapper()
 }
 
 
-data::PointSet data::get_locations(int id, string add_clause)
+data::PointSet data::get_locations(uint id, string add_clause)
 {
 	string query = fmt::format(
 		"SELECT \"time\", \"id\", \"lat\", \"lon\""
@@ -43,7 +43,7 @@ data::PointSet data::get_locations(int id, string add_clause)
 	return ps;
 }
 
-data::PointSet data::get_locations(int id, time_t t1, time_t t2)
+data::PointSet data::get_locations(uint id, time_t t1, time_t t2)
 {
 	string clause = fmt::format(
 		"AND time > '{0}' AND time < '{1}'",
