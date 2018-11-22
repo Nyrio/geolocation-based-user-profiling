@@ -1,5 +1,6 @@
 export VERSION = -std=c++11
 export CFLAGS = -Wall
+export EDLFLAGS = -pthread
 
 
 cli: common

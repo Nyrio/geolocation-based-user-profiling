@@ -13,7 +13,7 @@ endif
 cli: clear-main
 	echo "Compiling CLI"
 	g++ $(VERSION) $(CFLAGS) -I$(INCLUDE_DIR) -c -o $(BUILD_DIR)/cli.o cli.cpp
-	g++ $(VERSION) -pthread -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES) $(OSFLAG)
+	g++ $(VERSION) $(EDLFLAGS) -o ../cli $(BUILD_DIR)/cli.o $(OBJ_FILES) $(OSFLAG)
 
 api: clear-main
 	echo "Compiling API"
