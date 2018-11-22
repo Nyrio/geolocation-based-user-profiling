@@ -6,7 +6,6 @@
 #include "assert.h"
 #include "json.hpp"
 
-using namespace std;
 using json = nlohmann::json;
 
 namespace data
@@ -15,8 +14,8 @@ namespace data
     {
 
     public:
-        InfluxWrapper(string serverAddress_p, int serverPort_p,
-            string userName_p, string userPwd_p):
+        InfluxWrapper(std::string serverAddress_p, int serverPort_p,
+            std::string userName_p, std::string userPwd_p):
           serverAddress(serverAddress_p), serverPort(serverPort_p),
           userName(userName_p), userPwd(userPwd_p),
           serverInfo(serverAddress, serverPort, dbName, userName, userPwd)
@@ -29,9 +28,9 @@ namespace data
         /**
         * add a new entry to the influx db
         */
-        void writeEntry(long timestamp, string measurement, 
-                        vector<pair<string,string>>& tags,
-                        vector<pair<string,string>>& fields)
+        void writeEntry(long timestamp, std::string measurement, 
+                        vector<pair<std::string,std::string>>& tags,
+                        vector<pair<std::string,std::string>>& fields)
         {
             influxdb_cpp::detail::tag_caller *tagRef=  &influxdb_cpp::builder().meas(measurement);
             for(uint i = 0;i<tags.size();i++){
@@ -51,20 +50,20 @@ namespace data
         * @param resp: answer given by the server
         * @param query: influxdb query (influxQL syntax)
         */
-        json query(string & query)
+        json query(std::string & query)
         {
-            string resp;
+            std::string resp;
             influxdb_cpp::query(resp, query, serverInfo);
 
             return json::parse(resp);
         }
 
     private:
-        string serverAddress;
+        std::string serverAddress;
         int serverPort;
-        string userName;
-        string userPwd;
-        const string dbName="rawdata";
+        std::string userName;
+        std::string userPwd;
+        const std::string dbName="rawdata";
         influxdb_cpp::server_info serverInfo;
     };
 }

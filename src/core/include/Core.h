@@ -13,7 +13,7 @@ namespace services
 		~Core();
 
 		vector<data::Cluster> clusterize(uint id, time_t t1 = 0, time_t t2 = 0);
-		void find_house(uint id, time_t t1 = 0, time_t t2 = 0);
+		data::Cluster find_house(uint id, time_t t1 = 0, time_t t2 = 0);
 		void show_clusters(uint id, time_t t1 = 0, time_t t2 = 0);
 
 		/*

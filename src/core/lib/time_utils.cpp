@@ -1,6 +1,8 @@
 #include "time_utils.h"
 #include <cstdio>
 
+using namespace std;
+
 time_t time_utils::create_date(int day, int month, int year, int hours,
 		                       int minutes, int seconds)
 {

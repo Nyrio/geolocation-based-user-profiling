@@ -104,7 +104,7 @@ vector<data::Cluster> services::DJCluster::run(const data::WorkflowParam& wp)
     return output;
 }
 
-void services::DJCluster::load(PointSet points)
+void services::DJCluster::load(data::PointSet points)
 {
     if(DEBUG_MODE) cout << "load in rtree" << endl;
     preprocessing(points);
@@ -123,7 +123,7 @@ void services::DJCluster::load(PointSet points)
     }
 }
 
-void services::DJCluster::preprocessing(PointSet &points)
+void services::DJCluster::preprocessing(data::PointSet &points)
 {
 }
 
@@ -205,7 +205,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(
 }
 
 services::ClusterWrapper* services::DJCluster::getClusterJoinable(
-    Cluster& cluster, vector<services::ClusterWrapper*>& clusters, float epsilon)
+    data::Cluster& cluster, vector<services::ClusterWrapper*>& clusters, float epsilon)
 {
     double min[] = {0, 0};
     double max[] = {0, 0};
@@ -218,7 +218,7 @@ services::ClusterWrapper* services::DJCluster::getClusterJoinable(
         max[1] = clusters[i]->center.lon+epsilon;
         float * epsPtr=&epsilon;
         services::ClusterWrapper** foundPtr= &found;
-        for(TimeLoc tl : cluster){
+        for(data::TimeLoc tl : cluster){
             tree->Search(min,max, 
                 [=](services::TimeLocWrapper*p)
                 {

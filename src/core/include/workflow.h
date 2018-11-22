@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace data{
     struct WorkflowParam {
         float eps;
@@ -12,7 +10,7 @@ namespace data{
 
         float searchRadius;
         float sepMinutes;
-        vector<string> placeTypes;
+        std::vector<std::string> placeTypes;
 
         float precisionSec;
     };

@@ -4,8 +4,6 @@
 #include "datatypes.h"
 #include "workflow.h"
 
-using namespace std;
-
 namespace services
 {
 	// Return the centroid of a given points cluster

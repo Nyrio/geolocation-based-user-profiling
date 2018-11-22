@@ -27,12 +27,12 @@ services::Core::~Core()
 {
 }
 
-void services::Core::find_house(uint id, time_t t1, time_t t2)
+data::Cluster services::Core::find_house(uint id, time_t t1, time_t t2)
 {
-
+	// TODO
 }
 
-vector<Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
+vector<data::Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
 {
 	data::PointSet points;
 	if(t1 == 0 && t2 == 0) // No time range set
@@ -48,7 +48,7 @@ vector<Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
 	services::DJCluster djcluster;
 	djcluster.load(points);
 
-	vector<Cluster> clusters = djcluster.run(wp);
+	vector<data::Cluster> clusters = djcluster.run(wp);
 	return clusters;
 }
 
@@ -56,7 +56,7 @@ vector<Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
 // e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-31T08:30:00Z
 void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 {
-	vector<Cluster> clusters = this->clusterize(id, t1, t2);
+	vector<data::Cluster> clusters = this->clusterize(id, t1, t2);
 
 	cout << "clusters:" << endl;
 	uint pInClusters = 0;
@@ -156,7 +156,7 @@ void services::Core::testDJClustering()
 	}
 	services::DJCluster djcluster;
 	djcluster.load(points);
-	vector<Cluster> clusters = djcluster.run(wp);
+	vector<data::Cluster> clusters = djcluster.run(wp);
 	for(uint i = 0; i < clusters.size(); i++)
 	{
 		cout << "cluster:" << endl;

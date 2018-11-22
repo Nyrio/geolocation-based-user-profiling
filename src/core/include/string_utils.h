@@ -1,8 +1,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
+std::vector<std::string> split(const std::string &s, const char delim);
 
-vector<string> split(const string &s, const char delim);
-
-string str_join(const vector<string>& vs, const string delim);
+std::string str_join(const std::vector<std::string>& vs, const std::string delim);

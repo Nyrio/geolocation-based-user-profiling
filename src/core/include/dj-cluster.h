@@ -4,9 +4,6 @@
 #include "datatypes.h"
 #include "workflow.h"
 
-using namespace std;
-using namespace data;
-
 namespace services
 {
     inline double sqr(double a)
@@ -16,7 +13,7 @@ namespace services
 
     // wrapper for TimeLoc (used to add attributes to timeloc)
     typedef struct{
-        TimeLoc point;
+        data::TimeLoc point;
     } TimeLocWrapper;
 
     inline bool operator==(const TimeLocWrapper& lp1,
@@ -29,8 +26,8 @@ namespace services
     class ClusterWrapper
     {
     public:
-        Cluster cluster;
-        LocPoint center;
+        data::Cluster cluster;
+        data::LocPoint center;
 
         // create a cluster from a list of timeloc
         ClusterWrapper(vector<TimeLocWrapper>& points);
@@ -55,7 +52,7 @@ namespace services
 
         // run the algo, returns a list with the clusters found
         // no noise cluster in the list
-        vector<Cluster> run(const data::WorkflowParam& wp);
+        vector<data::Cluster> run(const data::WorkflowParam& wp);
 
     private:
         // function to preprocess data before the algorithm
@@ -76,7 +73,7 @@ namespace services
                                            float epsilon);
 
         // gets a cluster joinable with the cluster (aka each one share at least a point)
-        ClusterWrapper* getClusterJoinable(Cluster& cluster,
+        ClusterWrapper* getClusterJoinable(data::Cluster& cluster,
             vector<services::ClusterWrapper*>& clusters,float epsilon);
 
         // joins all the clusters
