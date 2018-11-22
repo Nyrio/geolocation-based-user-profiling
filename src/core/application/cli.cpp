@@ -97,6 +97,29 @@ void execute(services::Core &c, const string &s)
 
 			c.show_clusters(id, t1, t2);
 		}
+		else if (words[0].compare("analyze-tags") == 0)
+		{
+			uint id;
+			time_t t1, t2;
+
+			try
+			{
+				id = stoi(words[1]);
+				if(words.size() >= 4) {
+					t1 = time_utils::from_rfc3339(words[2]);
+					t2 = time_utils::from_rfc3339(words[3]);
+				}
+				else {
+					t1 = 0;
+					t2 = 0;
+				}
+			}
+			catch(...) {
+				cout << "Invalid parameters for analyze-tags <uid> [<t1> <t2>]" << endl;
+			}
+
+			c.analyze_tags(id, t1, t2);
+		}
 		else if (words[0].compare("XXXXXXX") == 0)
 		{
 			// TODO

@@ -32,6 +32,21 @@ data::Cluster services::Core::find_house(uint id, time_t t1, time_t t2)
 	// TODO
 }
 
+data::Cluster services::Core::analyze_tags(uint id, time_t t1, time_t t2)
+{
+	vector<data::Cluster> clusters = this->clusterize(id, t1, t2);
+
+	vector<pair<data::PointOfInterest, vector<data::Visit>>> visits
+		= services::clusters_visits(clusters, wp);
+
+	vector<pair<string, int>> freq_tags = services::most_frequent_tags(visits);
+
+	for(auto ft: freq_tags)
+	{
+		cout << ft.first << " " << ft.second << endl;
+	}
+}
+
 vector<data::Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
 {
 	data::PointSet points;

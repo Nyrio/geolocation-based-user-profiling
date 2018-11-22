@@ -2,6 +2,8 @@
 #define _USE_MATH_DEFINES
 #include <iostream>
 #include <set>
+#include <map>
+#include <algorithm>
 #include <cmath>
 #include <ctime>
 #include <future>
@@ -99,11 +101,10 @@ vector<pair<data::PointOfInterest, vector<data::Visit>>> services::clusters_visi
 
 	// Launch asynchronously the API calls for reverse geocoding
 	vector<future<set<string>>> amenities;
-	future<set<string>> testt;
 	amenities.resize(clusters.size());
 	for(uint i = 0; i < clusters.size(); i++)
 	{
-		testt = async(launch::async, data::get_amenities,
+		amenities[i] = async(launch::async, data::get_amenities,
 			                 visits[i].first.centroid, wp);
 	}
 
@@ -122,11 +123,47 @@ vector<pair<data::PointOfInterest, vector<data::Visit>>> services::clusters_visi
 	// Gather the responses calculated asynchronously with an external API
 	for(uint i = 0; i < clusters.size(); i++)
 	{
-		if(amenities[i].valid())
+		if(amenities[i].valid()) {
 			visits[i].first.amenities = amenities[i].get();
-		else
+		}
+		else {
 			visits[i].first.amenities = set<string>();
+		}
 	}
 
 	return visits;
+}
+
+
+vector<pair<string, int>> services::most_frequent_tags(
+		const vector<pair<data::PointOfInterest, vector<data::Visit>>>& visits)
+{
+	map<string, int> tags_freq;
+	for(auto visit: visits)
+	{
+		for(auto amenity: visit.first.amenities)
+		{
+			if(tags_freq.find(amenity) == tags_freq.end())
+				tags_freq.insert(pair<string, int>(amenity, 1));
+			else
+				tags_freq[amenity] += 1;
+		}
+	}
+
+	vector<pair<string, int>> freq_tags;
+	for(auto tpair: tags_freq)
+	{
+		freq_tags.push_back(tpair);
+	}
+
+	struct tpair_comp {
+	    bool operator()(pair< string, int> const&left, 
+	                    pair< string, int> const&right) const {
+	        return left.second > right.second;
+	    }
+	};
+
+	sort(freq_tags.begin(), freq_tags.end(), tpair_comp());
+
+	return freq_tags;
 }
