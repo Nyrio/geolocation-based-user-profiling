@@ -28,7 +28,10 @@ data::PointSet data::get_locations(uint id, string add_clause)
 	);
 	InfluxWrapper * wrapper = get_wrapper();
 	json resp = wrapper->query(query);
-
+	if(resp["results"][0]["error"] != nullptr)
+	{
+		cerr<< resp["results"][0]["error"]<<endl;
+	}
 	data::PointSet ps;
 	for(json location: resp["results"][0]["series"][0]["values"])
 	{
@@ -38,7 +41,6 @@ data::PointSet data::get_locations(uint id, string add_clause)
 		tl.loc.lon = location[3].get<double>();
 		ps.insert(tl);
 	}
-
 	delete wrapper;
 	return ps;
 }
