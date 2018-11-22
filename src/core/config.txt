@@ -1,6 +1,6 @@
 # DJ parameters
 eps=0.00002
-min_pts=50
+min_pts=100
 
 # Radius of search of an amenity around coordinates
 search_radius=10.
@@ -13,4 +13,4 @@ sep_minutes=10.
 place_types=amenity,leisure,tourism,building
 
 # Minimum time interval between two points
-precision_sec=10.
+precision_sec=20.

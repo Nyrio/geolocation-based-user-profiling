@@ -52,7 +52,7 @@ data::PointSet services::reduce_precision(
 	time_t last_time = 0;
 	for(auto tl: pointset)
 	{
-		if(difftime(tl.t, last_time) > wp.precisionSec)
+		if(last_time == 0 || difftime(tl.t, last_time) > wp.precisionSec)
 		{
 			new_set.insert(tl);
 			last_time = tl.t;

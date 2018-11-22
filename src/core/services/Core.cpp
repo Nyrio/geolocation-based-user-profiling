@@ -53,7 +53,7 @@ vector<data::Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
 }
 
 
-// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-31T08:30:00Z
+// e.g show-clusters 1 2014-10-01T00:00:00Z 2014-11-01T00:00:00Z
 void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 {
 	vector<data::Cluster> clusters = this->clusterize(id, t1, t2);
@@ -75,7 +75,7 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 	Benchmarks
 */
 
-// e.g benchmark clustering 1 2014-10-08T8:00:00Z 2014-10-31T8:30:00Z 1000 10
+// e.g benchmark clustering 1 2014-10-01T00:00:00Z 2014-11-01T00:00:00Z 10000 10
 void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 	                                      uint nbmax, uint nbmes)
 {
