@@ -15,6 +15,10 @@ namespace services
 	// a unique visit)
 	double get_cluster_hours_spent(const data::Cluster& cluster);
 
+	// Reduce the number of points by using a minimum time interval between two points
+	data::PointSet reduce_precision(
+		const data::PointSet& pointset, const data::WorkflowParam& wp);
+
 	// Cut the cluster in groups corresponding to a unique visit, with the
 	// criteria that points in the same visit mustn't be separated with
 	// more than sep_mn minutes

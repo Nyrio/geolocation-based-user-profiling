@@ -13,6 +13,8 @@ namespace data{
         float searchRadius;
         float sepMinutes;
         vector<string> placeTypes;
+
+        float precisionSec;
     };
     WorkflowParam loadParam(std::string file = "./config.txt");
     void parseWorkflow(WorkflowParam &w, std::string s);

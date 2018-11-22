@@ -45,6 +45,23 @@ double services::get_cluster_hours_spent(const data::Cluster& cluster)
 }
 
 
+data::PointSet services::reduce_precision(
+	const data::PointSet& pointset, const data::WorkflowParam& wp)
+{
+	data::PointSet new_set;
+	time_t last_time = 0;
+	for(auto tl: pointset)
+	{
+		if(difftime(tl.t, last_time) > wp.precisionSec)
+		{
+			new_set.insert(tl);
+			last_time = tl.t;
+		}
+	}
+	return new_set;
+}
+
+
 vector<data::Cluster> services::divide_cluster(
 	const data::Cluster& cluster, const data::WorkflowParam& wp)
 {

@@ -2,6 +2,7 @@
 #include <vector>
 #include "RTree.h"
 #include "datatypes.h"
+#include "workflow.h"
 
 using namespace std;
 using namespace data;
@@ -54,7 +55,7 @@ namespace services
 
         // run the algo, returns a list with the clusters found
         // no noise cluster in the list
-        vector<Cluster> run(float epsilon, uint minPts);
+        vector<Cluster> run(const data::WorkflowParam& wp);
 
     private:
         // function to preprocess data before the algorithm

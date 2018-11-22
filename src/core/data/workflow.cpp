@@ -57,6 +57,8 @@ void data::parseWorkflow(WorkflowParam &w, std::string s)
             w.sepMinutes = std::stof(value);
         } else if (name == "place_types") {
             w.placeTypes = split(value, ',');
+        }else if (name == "precision_sec") {
+            w.precisionSec = std::stof(value);
         }
     }
 }

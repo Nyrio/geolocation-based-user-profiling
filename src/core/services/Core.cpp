@@ -31,7 +31,7 @@ services::Core::~Core()
 }
 
 
-// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-8T08:30:00Z
+// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-31T08:30:00Z
 void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 {
 	data::PointSet points;
@@ -43,9 +43,12 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 
 	cout << "Got " << points.size() << " points" << endl;
 
+	points = services::reduce_precision(points, wp);
+	cout << "Kept " << points.size() << " points" << endl;
+
 	services::DJCluster djcluster;
 	djcluster.load(points);
-	vector<Cluster> clusters = djcluster.run(0.0002f, 2);
+	vector<Cluster> clusters = djcluster.run(wp);
 	cout << "clusters:" << endl;
 	uint pInClusters = 0;
 	for(data::Cluster cluster: clusters)
@@ -63,7 +66,7 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 	Benchmarks
 */
 
-// e.g benchmark clustering 1 2014-10-08T8:00:00Z 2014-10-31T8:30:00Z 10000 10
+// e.g benchmark clustering 1 2014-10-08T8:00:00Z 2014-10-31T8:30:00Z 1000 10
 void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 	                                      uint nbmax, uint nbmes)
 {
@@ -77,6 +80,9 @@ void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 
 	cout << "Got " << points.size() << " points in "
 	     << difftime(end, start) << " s" << endl;
+
+	points = services::reduce_precision(points, wp);
+	cout << "Kept " << points.size() << " points" << endl;
 
 	for(uint mesNum = 1; mesNum <= nbmes; mesNum++)
 	{
@@ -95,7 +101,7 @@ void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 		services::DJCluster djcluster;
 		djcluster.load(sample);
 		start = time(nullptr);
-		vector<data::Cluster> clusters = djcluster.run(0.0002f, 2);
+		vector<data::Cluster> clusters = djcluster.run(wp);
 		end = time(nullptr);
 		cout << sampleSize << ": " << difftime(end, start)
 		     << " s" << endl;
@@ -141,7 +147,7 @@ void services::Core::testDJClustering()
 	}
 	services::DJCluster djcluster;
 	djcluster.load(points);
-	vector<Cluster> clusters =djcluster.run(0.0002f, 2);
+	vector<Cluster> clusters = djcluster.run(wp);
 	for(uint i = 0; i < clusters.size(); i++)
 	{
 		cout << "cluster:" << endl;

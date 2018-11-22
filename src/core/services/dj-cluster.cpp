@@ -60,7 +60,7 @@ void services::DJCluster::cleanTree()
 }
 
 
-vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
+vector<data::Cluster> services::DJCluster::run(const data::WorkflowParam& wp)
 {
     if(DEBUG_MODE)
         cout << "run dj clustering" << endl;
@@ -75,7 +75,7 @@ vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
         if(DEBUG_MODE) cout << "point: " << point->point.t << endl;
 
         vector<services::TimeLocWrapper> neighbours;
-        this->neighbours(point, epsilon, minPts, neighbours);
+        this->neighbours(point, wp.eps, wp.minPts, neighbours);
         //no neighbours => noise
         if(neighbours.size()==0){
             //do nothing
@@ -84,10 +84,10 @@ vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
             if(DEBUG_MODE) cout << "new cluster: " << neighbours.size() << endl;
 
             services::ClusterWrapper * cluster = new services::ClusterWrapper(neighbours);
-            if(this->getClusterJoinable(neighbours,clusters,epsilon)){
+            if(this->getClusterJoinable(neighbours,clusters,wp.eps)){
                 if(DEBUG_MODE) cout << "cluster joinables" << endl;
                 clusters.push_back(cluster);
-                joinClusters(clusters,epsilon);
+                joinClusters(clusters,wp.eps);
             }else{
                 if(DEBUG_MODE) cout << "append cluster" << endl;
                 clusters.push_back(cluster);
