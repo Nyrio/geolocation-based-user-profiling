@@ -12,15 +12,15 @@ namespace services
 		Core(std::string parameterFile = "");
 		~Core();
 
-		vector<data::Cluster> clusterize(uint id, time_t t1 = 0, time_t t2 = 0);
+		void clusterize(uint id, time_t t1 = 0, time_t t2 = 0);
 
-		data::Cluster analyze_tags(uint id, time_t t1 = 0, time_t t2 = 0);
+		pair<data::Cluster,data::Cluster> find_place_hour_range(int h1, int h2);
+		
+		void analyze_tags();
+		void print_house();
+		void print_work();
 
-		data::Cluster find_place_hour_range(uint id, int h1, int h2, time_t t1 = 0, time_t t2 = 0);
-		void print_house(uint id, time_t t1 = 0, time_t t2 = 0);
-		void print_work(uint id, time_t t1 = 0, time_t t2 = 0);
-
-		void show_clusters(uint id, time_t t1 = 0, time_t t2 = 0);
+		void show_clusters();
 
 		/*
 			Benchmarks
@@ -37,6 +37,7 @@ namespace services
 
 	protected:
 		data::WorkflowParam wp;
+		vector<data::Cluster> clusters;
 	};
 
 }

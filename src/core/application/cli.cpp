@@ -54,8 +54,7 @@ void execute(services::Core &c, const string &s)
 	if (words.size() > 0)
 	{
 
-		if ((words[0].compare("house") == 0 || words[0].compare("workplace") == 0)
-			&& words.size() >= 2)
+		if (words[0].compare("load") == 0 && words.size() >= 2)
 		{
 			uint id;
 			time_t t1, t2;
@@ -73,12 +72,17 @@ void execute(services::Core &c, const string &s)
 				}
 			}
 			catch(...) {
-				cout << "Invalid parameters for house <uid> [<t1> <t2>]" << endl;
+				cout << "Invalid parameters for load <uid> [<t1> <t2>]" << endl;
 			}
-			if(words[0].compare("house") == 0)
-				c.print_house(id, t1, t2);
-			else
-				c.print_work(id, t1, t2);
+			c.clusterize(id, t1, t2);
+		}
+		else if(words[0].compare("house") == 0)
+		{
+			c.print_house();
+		}
+		else if(words[0].compare("workplace") == 0)
+		{
+				c.print_work();
 		}
 		/*
 		* Testing commands
@@ -104,51 +108,13 @@ void execute(services::Core &c, const string &s)
 				c.benchmark_clustering(id, t1, t2, nbmax, nbmes);
 			}
 		}
-		else if (words[0].compare("show-clusters") == 0 && words.size() >= 2)
+		else if (words[0].compare("show-clusters") == 0)
 		{
-			uint id;
-			time_t t1, t2;
-
-			try
-			{
-				id = stoi(words[1]);
-				if(words.size() >= 4) {
-					t1 = time_utils::from_rfc3339(words[2]);
-					t2 = time_utils::from_rfc3339(words[3]);
-				}
-				else {
-					t1 = 0;
-					t2 = 0;
-				}
-			}
-			catch(...) {
-				cout << "Invalid parameters for show-clusters <uid> [<t1> <t2>]" << endl;
-			}
-
-			c.show_clusters(id, t1, t2);
+			c.show_clusters();
 		}
-		else if (words[0].compare("analyze-tags") == 0)
+		else if (words[0].compare("analyze-tags"))
 		{
-			uint id;
-			time_t t1, t2;
-
-			try
-			{
-				id = stoi(words[1]);
-				if(words.size() >= 4) {
-					t1 = time_utils::from_rfc3339(words[2]);
-					t2 = time_utils::from_rfc3339(words[3]);
-				}
-				else {
-					t1 = 0;
-					t2 = 0;
-				}
-			}
-			catch(...) {
-				cout << "Invalid parameters for analyze-tags <uid> [<t1> <t2>]" << endl;
-			}
-
-			c.analyze_tags(id, t1, t2);
+			c.analyze_tags();
 		}
 		else if (words[0].compare("XXXXXXX") == 0)
 		{
