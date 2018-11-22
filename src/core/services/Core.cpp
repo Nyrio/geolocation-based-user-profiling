@@ -27,7 +27,45 @@ services::Core::~Core()
 {
 }
 
+void services::Core::print_house(uint id, time_t t1, time_t t2)
+{
+	data::Cluster house = this->find_house(id, t1, t2);
+	data::LocPoint centroid = services::cluster_centroid(house);
+	cout << "This person seems to sleep at : " << centroid.lat << " "
+	<< centroid.lon << endl;
+}
+
+// Find the house, assuming it's where the user sleeps and sleeps at night
 data::Cluster services::Core::find_house(uint id, time_t t1, time_t t2)
+{
+	int startNight = wp.startNight;
+	int endNight = wp.endNight;
+	vector<data::Cluster> clusters = this->clusterize(id, t1, t2);
+
+	data::Cluster bestSleepingPlace;
+	uint maxNights = 0;
+	for(auto place : clusters)
+	{	
+		uint nights = 0;
+		for(auto point : place)
+		{
+			int hour = gmtime(&(point.t))->tm_hour;
+			if(
+				(startNight > endNight && (hour >= startNight || hour < endNight)) ||
+				(startNight <= endNight && (hour >= startNight && hour < endNight))
+			)
+				++nights;
+		}
+		if(nights > maxNights)
+		{
+			bestSleepingPlace = place;
+			maxNights = nights;
+		}
+	}
+	return bestSleepingPlace;
+}
+
+data::Cluster services::Core::find_workplace(uint id, time_t t1, time_t t2)
 {
 	// TODO
 }

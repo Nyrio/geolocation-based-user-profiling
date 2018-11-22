@@ -53,7 +53,33 @@ void execute(services::Core &c, const string &s)
 	vector<string> words = split(s, ' ');
 	if (words.size() > 0)
 	{
-		if (words[0].compare("test") == 0 && words.size() >= 2)
+
+		if (words[0].compare("house") == 0 && words.size() >= 2)
+		{
+			uint id;
+			time_t t1, t2;
+
+			try
+			{
+				id = stoi(words[1]);
+				if(words.size() >= 4) {
+					t1 = time_utils::from_rfc3339(words[2]);
+					t2 = time_utils::from_rfc3339(words[3]);
+				}
+				else {
+					t1 = 0;
+					t2 = 0;
+				}
+			}
+			catch(...) {
+				cout << "Invalid parameters for house <uid> [<t1> <t2>]" << endl;
+			}
+			c.print_house(id, t1, t2);
+		}
+		/*
+		* Testing commands
+		*/
+		else if (words[0].compare("test") == 0 && words.size() >= 2)
 		{
 			if(words[1] == "clustering")
 				c.testDJClustering();
@@ -74,7 +100,7 @@ void execute(services::Core &c, const string &s)
 				c.benchmark_clustering(id, t1, t2, nbmax, nbmes);
 			}
 		}
-		else if (words[0].compare("show-clusters") == 0)
+		else if (words[0].compare("show-clusters") == 0 && words.size() >= 2)
 		{
 			uint id;
 			time_t t1, t2;
@@ -101,6 +127,9 @@ void execute(services::Core &c, const string &s)
 		{
 			// TODO
 		}
+		/*
+		* End of testing commands
+		*/ 
 		else
 		{
 			cout << "Unknown command" << endl;
