@@ -3,7 +3,6 @@
 #include <ctime>
 #include <algorithm>
 
-#include "datatypes.h"
 #include "clusters.h"
 #include "time_utils.h"
 #include "rawdata.h"
@@ -28,9 +27,12 @@ services::Core::~Core()
 {
 }
 
+void services::Core::find_house(uint id, time_t t1, time_t t2)
+{
 
-// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-31T08:30:00Z
-void services::Core::show_clusters(uint id, time_t t1, time_t t2)
+}
+
+vector<Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
 {
 	data::PointSet points;
 	if(t1 == 0 && t2 == 0) // No time range set
@@ -47,6 +49,14 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 	djcluster.load(points);
 
 	vector<Cluster> clusters = djcluster.run(wp);
+	return clusters;
+}
+
+
+// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-31T08:30:00Z
+void services::Core::show_clusters(uint id, time_t t1, time_t t2)
+{
+	vector<Cluster> clusters = this->clusterize(id, t1, t2);
 
 	cout << "clusters:" << endl;
 	uint pInClusters = 0;

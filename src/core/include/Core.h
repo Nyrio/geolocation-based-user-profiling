@@ -1,5 +1,7 @@
 #pragma once
 
+#include "datatypes.h"
+
 #include "workflow.h"
 
 namespace services
@@ -10,6 +12,8 @@ namespace services
 		Core(std::string parameterFile = "");
 		~Core();
 
+		vector<data::Cluster> clusterize(uint id, time_t t1 = 0, time_t t2 = 0);
+		void find_house(uint id, time_t t1 = 0, time_t t2 = 0);
 		void show_clusters(uint id, time_t t1 = 0, time_t t2 = 0);
 
 		/*
