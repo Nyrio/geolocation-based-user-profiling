@@ -1,10 +1,14 @@
 #include "Core.h"
 #include <iostream>
 #include <ctime>
+#include <string>
+#include <fstream>
 #include <algorithm>
 
 #include "clusters.h"
+#include "string_utils.h"
 #include "time_utils.h"
+
 #include "rawdata.h"
 #include "dj-cluster.h"
 
@@ -62,7 +66,7 @@ pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(int h1, 
 	uint maxInstants2 = 0;
 	uint ite = 0;
 	for(auto place : clusters)
-	{	
+	{
 		uint nights = 0;
 		for(auto point : place)
 		{
@@ -228,19 +232,47 @@ void services::Core::testDJClustering()
 	data::PointSet points;
 	//data::get_locations(1);
 
-	points.insert({{0, 0}, 0});
+	/*points.insert({{0, 0}, 0});
 	points.insert({{0.00001, 0}, 1});
 	points.insert({{0.00002, 0}, 2});
 	points.insert({{-0.00021, 0}, 3});
-	points.insert({{-0.00022, 0}, 4});
+	points.insert({{-0.00022, 0}, 4});*/
+	int size=0;
+	ifstream f ("gps-sample");
+	string line;
+	if (f.is_open())
+   {
+     while ( getline (f,line) )
+     {
+       vector<string> data = split(line,'\t');
+			 vector<string> date =split(data[1],' ');
+			 vector<string> dateD = split(date[0],'-');
+			 vector<string> dateH = split(date[1],':');
 
-	for(auto t:points){
+			 points.insert({{stod(data[2]),stod(data[3])}, time_utils::create_date(stod(dateD[2]),stod(dateD[1]),stod(dateD[0]), stod(dateH[0]), stod(dateH[1]), stod(dateH[2]))});
+			 size++;
+		 }
+     f.close();
+   }
+
+
+	/*for(auto t:points){
 		cout << t.t << " " << t.loc.lat << " " << t.loc.lon << endl;
-	}
+	}*/
 	services::DJCluster djcluster;
+	WorkflowParam wp;
+	wp.eps =0.0002f;
+	wp.minPts=10;
 	djcluster.load(points);
-	vector<data::Cluster> clusters = djcluster.run(wp);
-	for(uint i = 0; i < clusters.size(); i++)
+	time_t start, end;
+	cout<<"start benchmark: points = "<<size<<endl;
+	start= time(nullptr);
+	vector<Cluster> clusters =djcluster.run(wp);
+	end= time(nullptr);
+	cout<<"time clustering: "<<difftime(end,start)<<" , nb clusters: "<<clusters.size()<<endl;
+
+
+	/*for(uint i = 0; i < clusters.size(); i++)
 	{
 		cout << "cluster:" << endl;
 		for(auto point: clusters[i])
@@ -248,7 +280,7 @@ void services::Core::testDJClustering()
 			cout << "  timeloc: " << point.t << " "
 			     << point.loc.lat << " " << point.loc.lon << endl;
 		}
-	}
+	}*/
 }
 
 
