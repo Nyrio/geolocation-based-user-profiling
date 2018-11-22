@@ -18,8 +18,9 @@ def main(args):
                 lines.append(sline)
 
             cpt += 1
-            if cpt % 1000 == 0:
+            if cpt % 100000 == 0:
                 sys.stdout.write("\r%d" % cpt)
+        sys.stdout.write("\r%d\n" % cpt)
 
     with open(args.dest, 'w') as fhandler:
         fhandler.write("\n".join(lines))
