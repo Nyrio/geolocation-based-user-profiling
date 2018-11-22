@@ -11,7 +11,6 @@ void execute(services::Core &c, const string &s);
 
 int main(int argc, char *argv[])
 {
-
 	// default main arguments
 	string wp = "";
 	// main arguments parsing
@@ -46,7 +45,6 @@ int main(int argc, char *argv[])
 		else 
 			execute(c, s);
 	}
-
 	return 0;
 }
 
@@ -102,6 +100,10 @@ void execute(services::Core &c, const string &s)
 		else if (words[0].compare("XXXXXXX") == 0)
 		{
 			// TODO
+		}
+		else
+		{
+			cout << "Unknown command" << endl;
 		}
 	}
 }

@@ -21,8 +21,6 @@ services::Core::Core(string parameterFile)
 		wp = data::loadParam();
 	else
 		wp = data::loadParam(parameterFile);
-
-
 }
 
 
@@ -35,11 +33,10 @@ services::Core::~Core()
 void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 {
 	data::PointSet points;
-
 	if(t1 == 0 && t2 == 0) // No time range set
-		points = data::get_locations(1);
+		points = data::get_locations(id);
 	else
-		points = data::get_locations(1, t1, t2);
+		points = data::get_locations(id, t1, t2);
 
 	cout << "Got " << points.size() << " points" << endl;
 
@@ -48,7 +45,9 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 
 	services::DJCluster djcluster;
 	djcluster.load(points);
+
 	vector<Cluster> clusters = djcluster.run(wp);
+
 	cout << "clusters:" << endl;
 	uint pInClusters = 0;
 	for(data::Cluster cluster: clusters)

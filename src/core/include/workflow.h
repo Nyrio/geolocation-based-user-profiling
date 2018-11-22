@@ -7,7 +7,7 @@ using namespace std;
 
 namespace data{
     struct WorkflowParam {
-        double eps;
+        float eps;
         int minPts;
 
         float searchRadius;
