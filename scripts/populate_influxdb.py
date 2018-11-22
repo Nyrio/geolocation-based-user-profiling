@@ -13,16 +13,17 @@ def main(args):
     client.create_database("rawdata")
 
     if args.gps:
-        read_file(client, args.gps, "gps", args.limit)
+        read_file(client, args.gps, "gps", args.limit, args.step)
     if args.gsm:
-        read_file(client, args.gsm, "gsm", args.limit)
+        read_file(client, args.gsm, "gsm", args.limit, args.step)
     if args.wifi:
-        read_file(client, args.wifi, "wifi", args.limit)
+        read_file(client, args.wifi, "wifi", args.limit, args.step)
 
 
-def read_file(client, filename, mode, limit=None):
+def read_file(client, filename, mode, limit=None, step=1):
     """Read the content of the file and save it in the InfluxDB
     """
+    step = max(1, step)
     points_buffer = []
     with open(filename, 'r') as fhandler:
         # Read lines in the input file one at a time because the file
@@ -30,6 +31,9 @@ def read_file(client, filename, mode, limit=None):
         nb_lines = 0
         for line in fhandler:
             nb_lines += 1
+            if nb_lines % step != 0:
+                continue
+
             data = line.strip().split("\t")
 
             # Extract the data from the line
@@ -44,19 +48,19 @@ def read_file(client, filename, mode, limit=None):
                 fields = {"ip": data[2]}
 
             write_point(client, points_buffer, mode, time_str, tags,
-                        fields, nb_lines)
+                        fields, nb_lines // step)
 
-            if limit and nb_lines >= limit:
+            if limit and nb_lines // step >= limit:
                 break
 
         # Write remaining points
         client.write_points(points_buffer)
-        points_buffer.clear()
-        sys.stdout.write("\r%s: %d\n" % (mode, nb_lines))
+        points_buffer[:] = []
+        sys.stdout.write("\r%s: %d\n" % (mode, nb_lines // step))
 
 
 def write_point(client, points_buffer, measurement, time, tags, fields,
-                nb_lines=None):
+                nb_added=None):
     """Add the point to a buffer and write the buffer in DB if it's full.
     """
     point = {
@@ -68,10 +72,10 @@ def write_point(client, points_buffer, measurement, time, tags, fields,
     points_buffer.append(point)
     if len(points_buffer) >= BUFFER_SIZE:
         client.write_points(points_buffer)
-        points_buffer.clear()
+        points_buffer[:] = []
 
-        if nb_lines:
-            sys.stdout.write("\r%s: %d" % (measurement, nb_lines))
+        if nb_added:
+            sys.stdout.write("\r%s: %d" % (measurement, nb_added))
 
 
 def get_args():
@@ -86,6 +90,8 @@ def get_args():
 
     parser.add_argument("-l", "--limit", type=int,
                         help="Limit the number of entries")
+    parser.add_argument("-s", "--step", type=int,
+                        help="Step between entries")
 
     return parser.parse_args()
 

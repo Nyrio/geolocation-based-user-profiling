@@ -53,7 +53,41 @@ void execute(services::Core &c, const string &s)
 	vector<string> words = split(s, ' ');
 	if (words.size() > 0)
 	{
-		if (words[0].compare("test") == 0 && words.size() >= 2)
+
+		if (words[0].compare("load") == 0 && words.size() >= 2)
+		{
+			uint id;
+			time_t t1, t2;
+
+			try
+			{
+				id = stoi(words[1]);
+				if(words.size() >= 4) {
+					t1 = time_utils::from_rfc3339(words[2]);
+					t2 = time_utils::from_rfc3339(words[3]);
+				}
+				else {
+					t1 = 0;
+					t2 = 0;
+				}
+			}
+			catch(...) {
+				cout << "Invalid parameters for load <uid> [<t1> <t2>]" << endl;
+			}
+			c.clusterize(id, t1, t2);
+		}
+		else if(words[0].compare("house") == 0)
+		{
+			c.print_house();
+		}
+		else if(words[0].compare("workplace") == 0)
+		{
+				c.print_work();
+		}
+		/*
+		* Testing commands
+		*/
+		else if (words[0].compare("test") == 0 && words.size() >= 2)
 		{
 			if(words[1] == "clustering")
 				c.testDJClustering();
@@ -76,31 +110,19 @@ void execute(services::Core &c, const string &s)
 		}
 		else if (words[0].compare("show-clusters") == 0)
 		{
-			uint id;
-			time_t t1, t2;
-
-			try
-			{
-				id = stoi(words[1]);
-				if(words.size() >= 4) {
-					t1 = time_utils::from_rfc3339(words[2]);
-					t2 = time_utils::from_rfc3339(words[3]);
-				}
-				else {
-					t1 = 0;
-					t2 = 0;
-				}
-			}
-			catch(...) {
-				cout << "Invalid parameters for show-clusters <uid> [<t1> <t2>]" << endl;
-			}
-
-			c.show_clusters(id, t1, t2);
+			c.show_clusters();
+		}
+		else if (words[0].compare("frequent-places") == 0)
+		{
+			c.analyze_tags();
 		}
 		else if (words[0].compare("XXXXXXX") == 0)
 		{
 			// TODO
 		}
+		/*
+		* End of testing commands
+		*/ 
 		else
 		{
 			cout << "Unknown command" << endl;

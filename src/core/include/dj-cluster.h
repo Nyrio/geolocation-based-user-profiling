@@ -4,10 +4,8 @@
 
 #include "RTree.h"
 #include "datatypes.h"
-
-using namespace std;
+#include "workflow.h"
 using namespace data;
-
 namespace services
 {
     inline double sqr(double a)
@@ -59,7 +57,7 @@ namespace services
 
         // run the algo, returns a list with the clusters found
         // no noise cluster in the list
-        vector<Cluster> run(float epsilon, uint minPts);
+        vector<data::Cluster> run(const data::WorkflowParam& wp);
 
     private:
         // function to preprocess data before the algorithm

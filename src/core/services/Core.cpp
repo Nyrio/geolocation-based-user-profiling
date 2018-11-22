@@ -5,7 +5,6 @@
 #include <fstream>
 #include <algorithm>
 
-#include "datatypes.h"
 #include "clusters.h"
 #include "string_utils.h"
 #include "time_utils.h"
@@ -18,8 +17,6 @@ using namespace std;
 
 services::Core::Core(string parameterFile)
 {
-	cout << "Core created" << endl;
-
 	// load workflow
 	if(parameterFile.compare("")==0)
 		wp = data::loadParam();
@@ -32,9 +29,93 @@ services::Core::~Core()
 {
 }
 
+void services::Core::print_house()
+{
+	if(clusters.size() == 0)
+	{
+		cerr << "You must use 'load id [t1, t2]' before" << endl;
+		return;
+	}
+	auto houses = this->find_place_hour_range(wp.startNight, wp.endNight);
+	data::LocPoint centroid1 = services::cluster_centroid(houses.first);
+	data::LocPoint centroid2 = services::cluster_centroid(houses.second);
+	cout << "This person seems to sleep the more at : " << centroid1.lat << " "
+	<< centroid1.lon << endl;
+	cout << "And at : " << centroid2.lat << " " << centroid2.lon << endl;
+}
+void services::Core::print_work()
+{
+	if(clusters.size() == 0)
+	{
+		cerr << "You must use 'load id [t1, t2]' before" << endl;
+		return;
+	}
+	data::Cluster work = this->find_place_hour_range(wp.startWork, wp.endWork).first;
+	data::LocPoint centroid = services::cluster_centroid(work);
+	cout << "This person seems to work at : " << centroid.lat << " "
+	<< centroid.lon << endl;
+}
 
-// e.g show-clusters 1 2014-10-08T8:00:00Z 2014-10-8T08:30:00Z
-void services::Core::show_clusters(uint id, time_t t1, time_t t2)
+// Find 2 the places where the user has been the most in a given hour-range.
+// include h1, exclude h2
+pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(int h1, int h2)
+{
+	uint indexBestPlace1 = 0;
+	uint indexBestPlace2 = 0;
+	uint maxInstants1 = 0;
+	uint maxInstants2 = 0;
+	uint ite = 0;
+	for(auto place : clusters)
+	{
+		uint nights = 0;
+		for(auto point : place)
+		{
+			int hour = gmtime(&(point.t))->tm_hour;
+			if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
+				(h1 <= h2 && (hour >= h1 && hour < h2)) )
+				++nights;
+		}
+		if(nights > maxInstants1)
+		{
+			indexBestPlace2 = indexBestPlace1;
+			indexBestPlace1 = ite;
+			maxInstants2 = maxInstants1;
+			maxInstants1 = nights;
+		}
+		else if(nights > maxInstants2)
+		{
+			indexBestPlace2 = ite;
+			maxInstants2 = nights;
+		}
+		++ite;
+	}
+	pair<data::Cluster,data::Cluster> result = {clusters[indexBestPlace1], clusters[indexBestPlace2]};
+
+	return result;
+}
+
+void services::Core::analyze_tags()
+{
+	if(clusters.size() == 0)
+	{
+		cerr << "You must use 'load id [t1, t2]' before" << endl;
+		return;
+	}
+	vector<pair<data::PointOfInterest, vector<data::Visit>>> visits
+		= services::clusters_visits(clusters, wp);
+	vector<pair<string, int>> freq_tags = services::most_frequent_tags(visits);
+
+	cout << "Frequent places:" << endl;
+	int cpt = 1;
+	for(auto ft: freq_tags)
+	{
+		cout << cpt << ". " << ft.first << endl;
+		cpt += 1;
+		if(cpt == 11) break;
+	}
+}
+
+void services::Core::clusterize(uint id, time_t t1, time_t t2)
 {
 	data::PointSet points;
 	if(t1 == 0 && t2 == 0) // No time range set
@@ -44,9 +125,26 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 
 	cout << "Got " << points.size() << " points" << endl;
 
+	points = services::reduce_precision(points, wp);
+	cout << "Kept " << points.size() << " points" << endl;
+
+	cout << "Computing points of interest..." << endl;
+
 	services::DJCluster djcluster;
 	djcluster.load(points);
-	vector<Cluster> clusters = djcluster.run(wp.eps, wp.minPts);
+
+	clusters = djcluster.run(wp);
+}
+
+
+// e.g show-clusters 1 2014-10-01T00:00:00Z 2014-11-01T00:00:00Z
+void services::Core::show_clusters()
+{
+	if(clusters.size() == 0)
+	{
+		cerr << "You must use 'load id [t1, t2]' before" << endl;
+		return;
+	}
 	cout << "clusters:" << endl;
 	uint pInClusters = 0;
 	for(data::Cluster cluster: clusters)
@@ -64,7 +162,7 @@ void services::Core::show_clusters(uint id, time_t t1, time_t t2)
 	Benchmarks
 */
 
-// e.g benchmark clustering 1 2014-10-08T8:00:00Z 2014-10-31T8:30:00Z 10000 10
+// e.g benchmark clustering 1 2014-10-01T00:00:00Z 2014-11-01T00:00:00Z 10000 10
 void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 	                                      uint nbmax, uint nbmes)
 {
@@ -78,6 +176,9 @@ void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 
 	cout << "Got " << points.size() << " points in "
 	     << difftime(end, start) << " s" << endl;
+
+	points = services::reduce_precision(points, wp);
+	cout << "Kept " << points.size() << " points" << endl;
 
 	for(uint mesNum = 1; mesNum <= nbmes; mesNum++)
 	{
@@ -96,7 +197,7 @@ void services::Core::benchmark_clustering(uint id, time_t t1, time_t t2,
 		services::DJCluster djcluster;
 		djcluster.load(sample);
 		start = time(nullptr);
-		vector<data::Cluster> clusters = djcluster.run(0.0002f, 2);
+		vector<data::Cluster> clusters = djcluster.run(wp);
 		end = time(nullptr);
 		cout << sampleSize << ": " << difftime(end, start)
 		     << " s" << endl;
@@ -159,11 +260,14 @@ void services::Core::testDJClustering()
 		cout << t.t << " " << t.loc.lat << " " << t.loc.lon << endl;
 	}*/
 	services::DJCluster djcluster;
+	WorkflowParam wp;
+	wp.eps =0.0002f;
+	wp.minPts=10;
 	djcluster.load(points);
 	time_t start, end;
 	cout<<"start benchmark: points = "<<size<<endl;
 	start= time(nullptr);
-	vector<Cluster> clusters =djcluster.run(0.0002f, 10);
+	vector<Cluster> clusters =djcluster.run(wp);
 	end= time(nullptr);
 	cout<<"time clustering: "<<difftime(end,start)<<" , nb clusters: "<<clusters.size()<<endl;
 

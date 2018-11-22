@@ -69,13 +69,13 @@ void services::DJCluster::reset(){
     tree->GetFirst(iterator);
     while(!tree->IsNull(iterator))
     {
-        tree->GetAt(iterator)->idCluster==-2;
+        tree->GetAt(iterator)->idCluster=-2;
         tree->GetNext(iterator);
     }
 }
 
 
-vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
+vector<data::Cluster> services::DJCluster::run(const data::WorkflowParam& wp)
 {
     if(DEBUG_MODE)
         cout << "run dj clustering" << endl;
@@ -91,7 +91,7 @@ vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
         if(DEBUG_MODE) cout << "point: " << point->point.t << endl;
         if(point->idCluster==-2){
             vector<services::TimeLocWrapper*> neighbours;
-            this->neighbours(point, epsilon, minPts, neighbours);
+            this->neighbours(point, wp.eps, wp.minPts, neighbours);
             //no neighbours => noise
             if(neighbours.size()==0){
                 //do nothing
@@ -100,10 +100,10 @@ vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
                 if(DEBUG_MODE) cout << "new cluster: " << neighbours.size() << endl;
 
                 services::ClusterWrapper * cluster = new services::ClusterWrapper(neighbours,idCluster);
-                if(this->getClusterJoinable(clusters,epsilon)){
+                if(this->getClusterJoinable(clusters,wp.eps)){
                     if(DEBUG_MODE) cout << "cluster joinables" << endl;
                     clusters.push_back(cluster);
-                    joinClusters(clusters,epsilon,idCluster);
+                    joinClusters(clusters,wp.eps,idCluster);
                 }else{
                     if(DEBUG_MODE) cout << "append cluster" << endl;
                     clusters.push_back(cluster);
@@ -122,7 +122,7 @@ vector<data::Cluster> services::DJCluster::run(float epsilon, uint minPts)
     return output;
 }
 
-void services::DJCluster::load(PointSet points)
+void services::DJCluster::load(data::PointSet points)
 {
     if(DEBUG_MODE) cout << "load in rtree" << endl;
     preprocessing(points);
@@ -142,7 +142,7 @@ void services::DJCluster::load(PointSet points)
     }
 }
 
-void services::DJCluster::preprocessing(PointSet &points)
+void services::DJCluster::preprocessing(data::PointSet &points)
 {
 }
 

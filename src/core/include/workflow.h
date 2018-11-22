@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 namespace data{
     struct WorkflowParam {
         float eps;
@@ -12,7 +10,14 @@ namespace data{
 
         float searchRadius;
         float sepMinutes;
-        vector<string> placeTypes;
+        std::vector<std::string> placeTypes;
+
+        int startNight;
+        int endNight;
+        int startWork;
+        int endWork;
+
+        float precisionSec;
     };
     WorkflowParam loadParam(std::string file = "./config.txt");
     void parseWorkflow(WorkflowParam &w, std::string s);

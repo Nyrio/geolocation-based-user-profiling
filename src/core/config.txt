@@ -3,11 +3,20 @@ eps=0.0002
 min_pts=20
 
 # Radius of search of an amenity around coordinates
-search_radius=10.
+search_radius=30.
+
+#Night hours (integers)
+night_start=1
+night_end=6
+work_start=11
+work_end=16
 
 # Interval in minutes between two points to consider them in different
 # unique visites
 sep_minutes=10.
 
 # OpenStreetMap attributes to consider when tagging a position
-place_types=amenity,leisure,tourism,building
+place_types=amenity,leisure,tourism,building,shop,healthcare,aeroway,craft,historic,landuse,military,natural,office,public_transport,sport
+
+# Minimum time interval between two points
+precision_sec=3600.
