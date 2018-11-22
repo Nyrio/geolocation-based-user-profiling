@@ -12,6 +12,11 @@ namespace data{
         float sepMinutes;
         std::vector<std::string> placeTypes;
 
+        int startNight;
+        int endNight;
+        int startWork;
+        int endWork;
+
         float precisionSec;
     };
     WorkflowParam loadParam(std::string file = "./config.txt");
