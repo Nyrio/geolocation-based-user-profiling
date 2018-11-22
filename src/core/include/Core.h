@@ -13,7 +13,7 @@ namespace services
 		~Core();
 
 		vector<data::Cluster> clusterize(uint id, time_t t1 = 0, time_t t2 = 0);
-		data::Cluster find_place_hour_range(uint id, int h1, int h2, time_t t1 = 0, time_t t2 = 0);
+		pair<data::Cluster,data::Cluster> find_place_hour_range(uint id, int h1, int h2, time_t t1 = 0, time_t t2 = 0);
 		void print_house(uint id, time_t t1 = 0, time_t t2 = 0);
 		void print_work(uint id, time_t t1 = 0, time_t t2 = 0);
 		void show_clusters(uint id, time_t t1 = 0, time_t t2 = 0);

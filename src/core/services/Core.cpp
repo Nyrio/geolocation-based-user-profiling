@@ -29,46 +29,61 @@ services::Core::~Core()
 
 void services::Core::print_house(uint id, time_t t1, time_t t2)
 {
-	data::Cluster house = this->find_place_hour_range(id, wp.startNight, wp.endNight, t1, t2);
-	data::LocPoint centroid = services::cluster_centroid(house);
-	cout << "This person seems to sleep at : " << centroid.lat << " "
-	<< centroid.lon << endl;
+	auto houses = this->find_place_hour_range(id, wp.startNight, wp.endNight, t1, t2);
+	data::LocPoint centroid1 = services::cluster_centroid(houses.first);
+	data::LocPoint centroid2 = services::cluster_centroid(houses.second);
+	cout << "This person seems to sleep the more at : " << centroid1.lat << " "
+	<< centroid1.lon << endl;
+	cout << "And at : " << centroid2.lat << " " << centroid2.lon << endl;
 }
 void services::Core::print_work(uint id, time_t t1, time_t t2)
 {
-	data::Cluster work = this->find_place_hour_range(id, wp.startWork, wp.endWork, t1, t2);
+	data::Cluster work = this->find_place_hour_range(id, wp.startWork, wp.endWork, t1, t2).first;
 	data::LocPoint centroid = services::cluster_centroid(work);
 	cout << "This person seems to work at : " << centroid.lat << " "
 	<< centroid.lon << endl;
 }
 
-// Find the place where the user has been the most in a given hour-range.
+// Find 2 the places where the user has been the most in a given hour-range.
 // include h1, exclude h2
-data::Cluster services::Core::find_place_hour_range(uint id, int h1, int h2, time_t t1, time_t t2)
+pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(uint id, int h1, int h2, time_t t1, time_t t2)
 {
 	vector<data::Cluster> clusters = this->clusterize(id, t1, t2);
 
-	data::Cluster bestPlace;
-	uint maxInstants = 0;
+	uint indexBestPlace1 = 0;
+	uint indexBestPlace2 = 0;
+	uint maxInstants1 = 0;
+	uint maxInstants2 = 0;
+	uint ite = 0;
 	for(auto place : clusters)
 	{	
 		uint nights = 0;
 		for(auto point : place)
 		{
 			int hour = gmtime(&(point.t))->tm_hour;
-			if(
-				(h1 > h2 && (hour >= h1 || hour < h2)) ||
-				(h1 <= h2 && (hour >= h1 && hour < h2))
-			)
+			if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
+				(h1 <= h2 && (hour >= h1 && hour < h2)) )
 				++nights;
 		}
-		if(nights > maxInstants)
+		data::LocPoint centroid = services::cluster_centroid(place);
+		cout << "A cluster : "<< nights << " " << centroid.lat << " " << centroid.lon << endl;
+		if(nights > maxInstants1)
 		{
-			bestPlace = place;
-			maxInstants = nights;
+			indexBestPlace2 = indexBestPlace1;
+			indexBestPlace1 = ite;
+			maxInstants2 = maxInstants1;
+			maxInstants1 = nights;
 		}
+		else if(nights > maxInstants2)
+		{
+			indexBestPlace2 = ite;
+			maxInstants2 = nights;
+		}
+		++ite;
 	}
-	return bestPlace;
+	pair<data::Cluster,data::Cluster> result = {clusters[indexBestPlace1], clusters[indexBestPlace2]};
+
+	return result;
 }
 
 vector<data::Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)
