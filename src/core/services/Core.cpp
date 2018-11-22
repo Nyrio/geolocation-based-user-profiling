@@ -29,21 +29,27 @@ services::Core::~Core()
 
 void services::Core::print_house(uint id, time_t t1, time_t t2)
 {
-	data::Cluster house = this->find_house(id, t1, t2);
+	data::Cluster house = this->find_place_hour_range(id, wp.startNight, wp.endNight, t1, t2);
 	data::LocPoint centroid = services::cluster_centroid(house);
 	cout << "This person seems to sleep at : " << centroid.lat << " "
 	<< centroid.lon << endl;
 }
-
-// Find the house, assuming it's where the user sleeps and sleeps at night
-data::Cluster services::Core::find_house(uint id, time_t t1, time_t t2)
+void services::Core::print_work(uint id, time_t t1, time_t t2)
 {
-	int startNight = wp.startNight;
-	int endNight = wp.endNight;
+	data::Cluster work = this->find_place_hour_range(id, wp.startWork, wp.endWork, t1, t2);
+	data::LocPoint centroid = services::cluster_centroid(work);
+	cout << "This person seems to work at : " << centroid.lat << " "
+	<< centroid.lon << endl;
+}
+
+// Find the place where the user has been the most in a given hour-range.
+// include h1, exclude h2
+data::Cluster services::Core::find_place_hour_range(uint id, int h1, int h2, time_t t1, time_t t2)
+{
 	vector<data::Cluster> clusters = this->clusterize(id, t1, t2);
 
-	data::Cluster bestSleepingPlace;
-	uint maxNights = 0;
+	data::Cluster bestPlace;
+	uint maxInstants = 0;
 	for(auto place : clusters)
 	{	
 		uint nights = 0;
@@ -51,23 +57,18 @@ data::Cluster services::Core::find_house(uint id, time_t t1, time_t t2)
 		{
 			int hour = gmtime(&(point.t))->tm_hour;
 			if(
-				(startNight > endNight && (hour >= startNight || hour < endNight)) ||
-				(startNight <= endNight && (hour >= startNight && hour < endNight))
+				(h1 > h2 && (hour >= h1 || hour < h2)) ||
+				(h1 <= h2 && (hour >= h1 && hour < h2))
 			)
 				++nights;
 		}
-		if(nights > maxNights)
+		if(nights > maxInstants)
 		{
-			bestSleepingPlace = place;
-			maxNights = nights;
+			bestPlace = place;
+			maxInstants = nights;
 		}
 	}
-	return bestSleepingPlace;
-}
-
-data::Cluster services::Core::find_workplace(uint id, time_t t1, time_t t2)
-{
-	// TODO
+	return bestPlace;
 }
 
 vector<data::Cluster> services::Core::clusterize(uint id, time_t t1, time_t t2)

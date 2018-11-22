@@ -14,6 +14,8 @@ namespace data{
 
         int startNight;
         int endNight;
+        int startWork;
+        int endWork;
 
         float precisionSec;
     };

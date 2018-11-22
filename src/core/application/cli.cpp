@@ -54,7 +54,8 @@ void execute(services::Core &c, const string &s)
 	if (words.size() > 0)
 	{
 
-		if (words[0].compare("house") == 0 && words.size() >= 2)
+		if ((words[0].compare("house") == 0 || words[0].compare("workplace") == 0)
+			&& words.size() >= 2)
 		{
 			uint id;
 			time_t t1, t2;
@@ -74,7 +75,10 @@ void execute(services::Core &c, const string &s)
 			catch(...) {
 				cout << "Invalid parameters for house <uid> [<t1> <t2>]" << endl;
 			}
-			c.print_house(id, t1, t2);
+			if(words[0].compare("house") == 0)
+				c.print_house(id, t1, t2);
+			else
+				c.print_work(id, t1, t2);
 		}
 		/*
 		* Testing commands

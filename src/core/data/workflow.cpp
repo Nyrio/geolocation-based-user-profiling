@@ -35,6 +35,8 @@ void data::resetWorkflow(WorkflowParam &w){
 
     w.startNight = 23;
     w.endNight = 6;
+    w.startWork = 10;
+    w.endWork = 16;
 
     w.searchRadius = 10.;
     w.sepMinutes = 10.;
@@ -54,12 +56,18 @@ void data::parseWorkflow(WorkflowParam &w, string s)
             w.eps = stof(value);
         } else if (name == "min_pts") {
             w.minPts = stoi(value);
-        } else if (name == "search_radius") {
-            w.searchRadius = stof(value);
+            
         } else if (name == "night_start") {
             w.startNight = stoi(value);
         } else if (name == "night_end") {
             w.endNight = stoi(value);
+        } else if (name == "work_start") {
+            w.startWork = stoi(value);
+        } else if (name == "work_end") {
+            w.endWork = stoi(value);
+            
+        } else if (name == "search_radius") {
+            w.searchRadius = stof(value);
         } else if (name == "sep_minutes") {
             w.sepMinutes = stof(value);
         } else if (name == "place_types") {
