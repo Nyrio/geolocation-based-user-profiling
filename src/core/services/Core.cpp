@@ -13,8 +13,6 @@ using namespace std;
 
 services::Core::Core(string parameterFile)
 {
-	cout << "Core created" << endl;
-
 	// load workflow
 	if(parameterFile.compare("")==0)
 		wp = data::loadParam();
@@ -103,9 +101,13 @@ void services::Core::analyze_tags()
 		= services::clusters_visits(clusters, wp);
 	vector<pair<string, int>> freq_tags = services::most_frequent_tags(visits);
 
+	cout << "Frequent places:" << endl;
+	int cpt = 1;
 	for(auto ft: freq_tags)
 	{
-		cout << ft.first << " " << ft.second << endl;
+		cout << cpt << ". " << ft.first << endl;
+		cpt += 1;
+		if(cpt == 11) break;
 	}
 }
 
@@ -121,6 +123,8 @@ void services::Core::clusterize(uint id, time_t t1, time_t t2)
 
 	points = services::reduce_precision(points, wp);
 	cout << "Kept " << points.size() << " points" << endl;
+
+	cout << "Computing points of interest..." << endl;
 
 	services::DJCluster djcluster;
 	djcluster.load(points);

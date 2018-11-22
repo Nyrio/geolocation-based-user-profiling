@@ -112,7 +112,7 @@ void execute(services::Core &c, const string &s)
 		{
 			c.show_clusters();
 		}
-		else if (words[0].compare("analyze-tags"))
+		else if (words[0].compare("frequent-places") == 0)
 		{
 			c.analyze_tags();
 		}
