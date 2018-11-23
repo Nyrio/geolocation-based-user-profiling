@@ -14,7 +14,8 @@ namespace services
 
 		void clusterize(uint id, time_t t1 = 0, time_t t2 = 0);
 
-		pair<data::Cluster,data::Cluster> find_place_hour_range(int h1, int h2);
+		pair<data::Cluster,data::Cluster> find_place_hour_range(int h1, int h2,
+			bool useDuration = false);
 		
 		void analyze_tags();
 		void print_house();

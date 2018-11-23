@@ -36,12 +36,19 @@ void services::Core::print_house()
 		cerr << "You must use 'load id [t1, t2]' before" << endl;
 		return;
 	}
-	auto houses = this->find_place_hour_range(wp.startNight, wp.endNight);
+	auto houses = this->find_place_hour_range(wp.startNight, wp.endNight, true);
 	data::LocPoint centroid1 = services::cluster_centroid(houses.first);
 	data::LocPoint centroid2 = services::cluster_centroid(houses.second);
 	cout << "This person seems to sleep the more at : " << centroid1.lat << " "
 	<< centroid1.lon << endl;
 	cout << "And at : " << centroid2.lat << " " << centroid2.lon << endl;
+	// old way
+	cout << " (WITHOUT DURATION :  ";
+	houses = this->find_place_hour_range(wp.startNight, wp.endNight);
+	centroid1 = services::cluster_centroid(houses.first);
+	centroid2 = services::cluster_centroid(houses.second);
+	cout << centroid1.lat << " " << centroid1.lon << " and " 
+	<< centroid2.lat << " " << centroid2.lon << ")" << endl;
 }
 void services::Core::print_work()
 {
@@ -50,42 +57,60 @@ void services::Core::print_work()
 		cerr << "You must use 'load id [t1, t2]' before" << endl;
 		return;
 	}
-	data::Cluster work = this->find_place_hour_range(wp.startWork, wp.endWork).first;
+	data::Cluster work = this->find_place_hour_range(wp.startWork, wp.endWork, true).first;
 	data::LocPoint centroid = services::cluster_centroid(work);
 	cout << "This person seems to work at : " << centroid.lat << " "
 	<< centroid.lon << endl;
+	// old way
+	work = this->find_place_hour_range(wp.startWork, wp.endWork).first;
+	centroid = services::cluster_centroid(work);
+	cout << "(WITHOUT DURATION : " << centroid.lat << " " << centroid.lon << ")" << endl;
 }
 
 // Find 2 the places where the user has been the most in a given hour-range.
 // include h1, exclude h2
-pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(int h1, int h2)
+pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(int h1, int h2, bool useDuration)
 {
 	uint indexBestPlace1 = 0;
 	uint indexBestPlace2 = 0;
-	uint maxInstants1 = 0;
-	uint maxInstants2 = 0;
+	double maxInstants1 = 0;
+	double maxInstants2 = 0;
 	uint ite = 0;
 	for(auto place : clusters)
 	{
-		uint nights = 0;
-		for(auto point : place)
+		double duration = 0;
+		if(useDuration)
 		{
-			int hour = gmtime(&(point.t))->tm_hour;
-			if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
-				(h1 <= h2 && (hour >= h1 && hour < h2)) )
-				++nights;
+			vector<data::Cluster> temp_clusters = divide_cluster(place, wp);
+			for(data::Cluster& temp_cluster: temp_clusters)
+			{
+				int hour = gmtime(&(temp_cluster.begin()->t))->tm_hour;
+				if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
+					(h1 <= h2 && (hour >= h1 && hour < h2)) )
+				duration += difftime(temp_cluster.begin()->t, temp_cluster.rbegin()->t);
+			}
 		}
-		if(nights > maxInstants1)
+		else 
+		{
+			for(auto point : place)
+			{
+				int hour = gmtime(&(point.t))->tm_hour;
+				if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
+					(h1 <= h2 && (hour >= h1 && hour < h2)) )
+					++duration;
+			}
+		}
+		if(duration > maxInstants1)
 		{
 			indexBestPlace2 = indexBestPlace1;
 			indexBestPlace1 = ite;
 			maxInstants2 = maxInstants1;
-			maxInstants1 = nights;
+			maxInstants1 = duration;
 		}
-		else if(nights > maxInstants2)
+		else if(duration > maxInstants2)
 		{
 			indexBestPlace2 = ite;
-			maxInstants2 = nights;
+			maxInstants2 = duration;
 		}
 		++ite;
 	}

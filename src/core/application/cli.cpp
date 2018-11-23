@@ -84,6 +84,14 @@ void execute(services::Core &c, const string &s)
 		{
 				c.print_work();
 		}
+		else if (words[0].compare("show-clusters") == 0)
+		{
+			c.show_clusters();
+		}
+		else if (words[0].compare("frequent-places") == 0)
+		{
+			c.analyze_tags();
+		}
 		/*
 		* Testing commands
 		*/
@@ -107,14 +115,6 @@ void execute(services::Core &c, const string &s)
 				uint nbmes = stoi(words[6]);
 				c.benchmark_clustering(id, t1, t2, nbmax, nbmes);
 			}
-		}
-		else if (words[0].compare("show-clusters") == 0)
-		{
-			c.show_clusters();
-		}
-		else if (words[0].compare("frequent-places") == 0)
-		{
-			c.analyze_tags();
 		}
 		else if (words[0].compare("XXXXXXX") == 0)
 		{

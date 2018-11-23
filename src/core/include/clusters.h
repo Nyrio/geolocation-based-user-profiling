@@ -25,7 +25,8 @@ namespace services
 
 	// TODO: write what this function is doing
 	vector<pair<data::PointOfInterest, vector<data::Visit>>> clusters_visits(
-		const vector<data::Cluster>& clusters, const data::WorkflowParam& wp);
+		const vector<data::Cluster>& clusters, const data::WorkflowParam& wp,
+		bool ignoreAmenities = false);
 
 	// Sort tags by most frequent
 	vector<pair<string, int>> most_frequent_tags(
