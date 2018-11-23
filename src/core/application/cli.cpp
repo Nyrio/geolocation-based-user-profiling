@@ -8,6 +8,7 @@
 using namespace std;
 
 void execute(services::Core &c, const string &s);
+void print_help();
 
 int main(int argc, char *argv[])
 {
@@ -92,6 +93,10 @@ void execute(services::Core &c, const string &s)
 		{
 			c.analyze_tags();
 		}
+		else if (words[0].compare("help") == 0)
+		{
+			print_help();
+		}
 		/*
 		* Testing commands
 		*/
@@ -128,4 +133,21 @@ void execute(services::Core &c, const string &s)
 			cout << "Unknown command" << endl;
 		}
 	}
+}
+
+void print_help()
+{
+	cout << endl << "First you have to specify the user (and optionnaly the time range) to work on : " << endl
+	<< "    >>> load id [t1 t2]" << endl
+	<< "Then you can find information :" << endl
+	<< "Find where the user lives. This gives 2 main living-points (and another ignoring durations)" << endl
+	<< "    >>> house" << endl
+	<< "Find where the user works. This give a place (and another ignoring durations)" << endl
+	<< "    >>> workplace" << endl
+	<< "Find tags about the places " << endl
+	<< "    >>> frequent-places" << endl
+	<< "Show all clusters found" << endl
+	<< "    >>> show-clusters" << endl << endl
+	<< "To leave the application :" << endl
+	<< "    >>> exit" << endl << endl;
 }
