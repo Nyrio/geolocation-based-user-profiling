@@ -1,10 +1,14 @@
 #include "Core.h"
 #include <iostream>
 #include <ctime>
+#include <string>
+#include <fstream>
 #include <algorithm>
 
 #include "clusters.h"
+#include "string_utils.h"
 #include "time_utils.h"
+
 #include "rawdata.h"
 #include "dj-cluster.h"
 
@@ -32,12 +36,19 @@ void services::Core::print_house()
 		cerr << "You must use 'load id [t1, t2]' before" << endl;
 		return;
 	}
-	auto houses = this->find_place_hour_range(wp.startNight, wp.endNight);
+	auto houses = this->find_place_hour_range(wp.startNight, wp.endNight, true);
 	data::LocPoint centroid1 = services::cluster_centroid(houses.first);
 	data::LocPoint centroid2 = services::cluster_centroid(houses.second);
 	cout << "This person seems to sleep the more at : " << centroid1.lat << " "
 	<< centroid1.lon << endl;
 	cout << "And at : " << centroid2.lat << " " << centroid2.lon << endl;
+	// old way
+	cout << " (WITHOUT DURATION :  ";
+	houses = this->find_place_hour_range(wp.startNight, wp.endNight);
+	centroid1 = services::cluster_centroid(houses.first);
+	centroid2 = services::cluster_centroid(houses.second);
+	cout << centroid1.lat << " " << centroid1.lon << " and " 
+	<< centroid2.lat << " " << centroid2.lon << ")" << endl;
 }
 void services::Core::print_work()
 {
@@ -46,42 +57,60 @@ void services::Core::print_work()
 		cerr << "You must use 'load id [t1, t2]' before" << endl;
 		return;
 	}
-	data::Cluster work = this->find_place_hour_range(wp.startWork, wp.endWork).first;
+	data::Cluster work = this->find_place_hour_range(wp.startWork, wp.endWork, true).first;
 	data::LocPoint centroid = services::cluster_centroid(work);
 	cout << "This person seems to work at : " << centroid.lat << " "
 	<< centroid.lon << endl;
+	// old way
+	work = this->find_place_hour_range(wp.startWork, wp.endWork).first;
+	centroid = services::cluster_centroid(work);
+	cout << "(WITHOUT DURATION : " << centroid.lat << " " << centroid.lon << ")" << endl;
 }
 
 // Find 2 the places where the user has been the most in a given hour-range.
 // include h1, exclude h2
-pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(int h1, int h2)
+pair<data::Cluster,data::Cluster> services::Core::find_place_hour_range(int h1, int h2, bool useDuration)
 {
 	uint indexBestPlace1 = 0;
 	uint indexBestPlace2 = 0;
-	uint maxInstants1 = 0;
-	uint maxInstants2 = 0;
+	double maxInstants1 = 0;
+	double maxInstants2 = 0;
 	uint ite = 0;
 	for(auto place : clusters)
-	{	
-		uint nights = 0;
-		for(auto point : place)
+	{
+		double duration = 0;
+		if(useDuration)
 		{
-			int hour = gmtime(&(point.t))->tm_hour;
-			if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
-				(h1 <= h2 && (hour >= h1 && hour < h2)) )
-				++nights;
+			vector<data::Cluster> temp_clusters = divide_cluster(place, wp);
+			for(data::Cluster& temp_cluster: temp_clusters)
+			{
+				int hour = gmtime(&(temp_cluster.begin()->t))->tm_hour;
+				if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
+					(h1 <= h2 && (hour >= h1 && hour < h2)) )
+				duration += difftime(temp_cluster.begin()->t, temp_cluster.rbegin()->t);
+			}
 		}
-		if(nights > maxInstants1)
+		else 
+		{
+			for(auto point : place)
+			{
+				int hour = gmtime(&(point.t))->tm_hour;
+				if( (h1 > h2 && (hour >= h1 || hour < h2)) ||
+					(h1 <= h2 && (hour >= h1 && hour < h2)) )
+					++duration;
+			}
+		}
+		if(duration > maxInstants1)
 		{
 			indexBestPlace2 = indexBestPlace1;
 			indexBestPlace1 = ite;
 			maxInstants2 = maxInstants1;
-			maxInstants1 = nights;
+			maxInstants1 = duration;
 		}
-		else if(nights > maxInstants2)
+		else if(duration > maxInstants2)
 		{
 			indexBestPlace2 = ite;
-			maxInstants2 = nights;
+			maxInstants2 = duration;
 		}
 		++ite;
 	}
@@ -228,19 +257,47 @@ void services::Core::testDJClustering()
 	data::PointSet points;
 	//data::get_locations(1);
 
-	points.insert({{0, 0}, 0});
+	/*points.insert({{0, 0}, 0});
 	points.insert({{0.00001, 0}, 1});
 	points.insert({{0.00002, 0}, 2});
 	points.insert({{-0.00021, 0}, 3});
-	points.insert({{-0.00022, 0}, 4});
+	points.insert({{-0.00022, 0}, 4});*/
+	int size=0;
+	ifstream f ("gps-sample");
+	string line;
+	if (f.is_open())
+   {
+     while ( getline (f,line) )
+     {
+       vector<string> data = split(line,'\t');
+			 vector<string> date =split(data[1],' ');
+			 vector<string> dateD = split(date[0],'-');
+			 vector<string> dateH = split(date[1],':');
 
-	for(auto t:points){
+			 points.insert({{stod(data[2]),stod(data[3])}, time_utils::create_date(stod(dateD[2]),stod(dateD[1]),stod(dateD[0]), stod(dateH[0]), stod(dateH[1]), stod(dateH[2]))});
+			 size++;
+		 }
+     f.close();
+   }
+
+
+	/*for(auto t:points){
 		cout << t.t << " " << t.loc.lat << " " << t.loc.lon << endl;
-	}
+	}*/
 	services::DJCluster djcluster;
+	WorkflowParam wp;
+	wp.eps =0.0002f;
+	wp.minPts=10;
 	djcluster.load(points);
-	vector<data::Cluster> clusters = djcluster.run(wp);
-	for(uint i = 0; i < clusters.size(); i++)
+	time_t start, end;
+	cout<<"start benchmark: points = "<<size<<endl;
+	start= time(nullptr);
+	vector<Cluster> clusters =djcluster.run(wp);
+	end= time(nullptr);
+	cout<<"time clustering: "<<difftime(end,start)<<" , nb clusters: "<<clusters.size()<<endl;
+
+
+	/*for(uint i = 0; i < clusters.size(); i++)
 	{
 		cout << "cluster:" << endl;
 		for(auto point: clusters[i])
@@ -248,7 +305,7 @@ void services::Core::testDJClustering()
 			cout << "  timeloc: " << point.t << " "
 			     << point.loc.lat << " " << point.loc.lon << endl;
 		}
-	}
+	}*/
 }
 
 

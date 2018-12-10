@@ -87,7 +87,7 @@ vector<data::Cluster> services::divide_cluster(
 
 
 vector<pair<data::PointOfInterest, vector<data::Visit>>> services::clusters_visits(
-		const vector<data::Cluster>& clusters, const data::WorkflowParam& wp)
+		const vector<data::Cluster>& clusters, const data::WorkflowParam& wp, bool ignoreAmenities)
 {
 	vector<pair<data::PointOfInterest, vector<data::Visit>>> visits;
 	visits.resize(clusters.size());
@@ -99,13 +99,26 @@ vector<pair<data::PointOfInterest, vector<data::Visit>>> services::clusters_visi
 		visits[i].first.centroid = cluster_centroid(clusters[i]);
 	}
 
-	// Launch asynchronously the API calls for reverse geocoding
-	vector<future<set<string>>> amenities;
-	amenities.resize(clusters.size());
-	for(uint i = 0; i < clusters.size(); i++)
+	if(!ignoreAmenities)
 	{
-		amenities[i] = async(launch::async, data::get_amenities,
-			                 visits[i].first.centroid, wp);
+		vector<future<set<string>>> amenities;
+		// Launch asynchronously the API calls for reverse geocoding
+		amenities.resize(clusters.size());
+		for(uint i = 0; i < clusters.size(); i++)
+		{
+			amenities[i] = async(launch::async, data::get_amenities,
+								visits[i].first.centroid, wp);
+		}
+		// Gather the responses calculated asynchronously with an external API
+		for(uint i = 0; i < clusters.size(); i++)
+		{
+			if(amenities[i].valid()) {
+				visits[i].first.amenities = amenities[i].get();
+			}
+			else {
+				visits[i].first.amenities = set<string>();
+			}
+		}
 	}
 
 	// For each spatial cluster, cut it in temporal intervals and
@@ -116,20 +129,10 @@ vector<pair<data::PointOfInterest, vector<data::Visit>>> services::clusters_visi
 		for(data::Cluster& temp_cluster: temp_clusters)
 		{
 			visits[i].second.push_back(
-				{(*temp_cluster.begin()).t, (*temp_cluster.rbegin()).t});
+				{temp_cluster.begin()->t, temp_cluster.rbegin()->t});
 		}
 	}
 
-	// Gather the responses calculated asynchronously with an external API
-	for(uint i = 0; i < clusters.size(); i++)
-	{
-		if(amenities[i].valid()) {
-			visits[i].first.amenities = amenities[i].get();
-		}
-		else {
-			visits[i].first.amenities = set<string>();
-		}
-	}
 
 	return visits;
 }

@@ -1,9 +1,11 @@
 #pragma once
 #include <vector>
+#include <map>
+
 #include "RTree.h"
 #include "datatypes.h"
 #include "workflow.h"
-
+using namespace data;
 namespace services
 {
     inline double sqr(double a)
@@ -13,7 +15,8 @@ namespace services
 
     // wrapper for TimeLoc (used to add attributes to timeloc)
     typedef struct{
-        data::TimeLoc point;
+        TimeLoc point;
+        int idCluster=-2; //-2 => no cluster/ noise, -1 => neighbours, else => index cluster
     } TimeLocWrapper;
 
     inline bool operator==(const TimeLocWrapper& lp1,
@@ -26,11 +29,13 @@ namespace services
     class ClusterWrapper
     {
     public:
-        data::Cluster cluster;
-        data::LocPoint center;
-
+        //used to store the ref to the pointer, to update idClustering during fusion
+        map<TimeLoc,TimeLocWrapper*> mapRefs;
+        Cluster cluster;
+        LocPoint center;
+        int idCluster;
         // create a cluster from a list of timeloc
-        ClusterWrapper(vector<TimeLocWrapper>& points);
+        ClusterWrapper(vector<TimeLocWrapper*>& points,int idCluster);
 
         // adds all not-already in timelocs from the cluster other in this
         void fusion(ClusterWrapper * other);
@@ -61,23 +66,23 @@ namespace services
 
         // reset the tree
         void cleanTree();
-
+        //clean cluster ids
+        void reset();
         // gets the neighbours of point, within epsilon and with a minimum
         // of minPts neighbours
         void neighbours(TimeLocWrapper * point, float epsilon, uint minPts,
-                        vector<TimeLocWrapper>& neighbours);
+                        vector<TimeLocWrapper*>& neighbours);
 
         // gets a cluster joinable with the neighbours list (aka each one share at least a point)
-        ClusterWrapper* getClusterJoinable(vector<services::TimeLocWrapper>& neighbours,
-                                           vector<services::ClusterWrapper*>& clusters,
+        ClusterWrapper* getClusterJoinable(vector<services::ClusterWrapper*>& clusters,
                                            float epsilon);
 
         // gets a cluster joinable with the cluster (aka each one share at least a point)
-        ClusterWrapper* getClusterJoinable(data::Cluster& cluster,
+        ClusterWrapper* getClusterJoinable(ClusterWrapper* cluster,
             vector<services::ClusterWrapper*>& clusters,float epsilon);
 
         // joins all the clusters
-        void joinClusters(vector<ClusterWrapper*>& clusters,float epsilon);
+        void joinClusters(vector<ClusterWrapper*>& clusters,float epsilon,int & lastIdCluster);
 
 
         /*
